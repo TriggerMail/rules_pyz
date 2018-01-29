@@ -225,10 +225,10 @@ func renameIfNotExists(oldPath string, newPath string) error {
 
 func main() {
 	requirements := flag.String("requirements", "", "path to requirements.txt")
-	output := flag.String("output", "", "path to write pypi_requirements.bzl")
+	output := flag.String("output", "", "path to write pypi_rules.bzl")
 	wheelURLPrefix := flag.String("wheelURLPrefix", "", "prefixes where wheels can be downloaded")
 	preferPyPI := flag.Bool("preferPyPI", true, "download from PyPI if possible")
-	rulesWorkspace := flag.String("rulesWorkspace", "@ca_evanjones_rules_python_zip",
+	rulesWorkspace := flag.String("rulesWorkspace", "@com_bluecore_rules_pyz",
 		"Bazel Workspace path for rules_python_zip")
 	wheelDir := flag.String("wheelDir", "", "Directory to save wheels")
 	ruleType := flag.String("rulesType", "pyz", "Type of rules to generate: pyz or pex")
