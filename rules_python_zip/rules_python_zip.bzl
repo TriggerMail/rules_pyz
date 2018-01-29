@@ -38,6 +38,14 @@ def get_pythonroot(ctx):
 
     # Find the path to the package containing this rule: BUILD file without /BUILD
     base = ctx.build_file_path[:ctx.build_file_path.rfind('/')]
+
+    # external repositories: have a path like external/workspace_name/...
+    # however the file .short_path look like "../workspace_name/..."
+    # strip external: it is a reserved directory name so this should not collide
+    EXTERNAL_PREFIX = "external/"
+    if base.startswith(EXTERNAL_PREFIX):
+      base = base[len(EXTERNAL_PREFIX):]
+
     if ctx.attr.pythonroot == ".":
         pythonroot = base
     elif ctx.attr.pythonroot.startswith("//"):
@@ -67,6 +75,10 @@ def _get_transitive_provider(ctx):
     for files_attr in (ctx.files.srcs, ctx.files.data):
         for f in files_attr:
             dst = f.short_path
+            # external repositories have paths like "../repository_name/"
+            if dst.startswith("../"):
+                dst = dst[3:]
+
             if f.short_path.startswith(prefix):
                 dst = dst[len(prefix):]
             src_mapping.append(struct(src=f.path, dst=dst))
