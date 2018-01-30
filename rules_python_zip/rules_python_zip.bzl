@@ -210,10 +210,12 @@ def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False):
     '''Macro that outputs a pyz_binary with all the test code and executes it with a shell script
     to pass the correct arguments.'''
 
+    # Label ensures this is resolved correctly if used as an external workspace
+    pytest_label = Label("//rules_python_zip:pytest")
     compiled_deps_name = "%s_deps" % (name)
     pyz_binary(
         name = compiled_deps_name,
-        deps = deps + ["//rules_python_zip:pytest"],
+        deps = deps + [str(pytest_label)],
         wheels = wheels,
         entry_point = "pytest",
         testonly = True,
