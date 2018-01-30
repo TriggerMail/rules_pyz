@@ -110,10 +110,11 @@ pyz_library = rule(
 )
 
 def _pyz_binary_impl(ctx):
-    if len(ctx.files.srcs) > 0 and ctx.attr.entry_point != "":
-        fail("must specify exactly one of srcs OR entry_point")
-    if len(ctx.files.srcs) == 0 and ctx.attr.entry_point == "":
-        fail("must specify at least one src (first is the entry point), or entry_point")
+    main_options_count = (int(len(ctx.files.srcs) > 0) + int(ctx.attr.entry_point != "") +
+        int(ctx.attr.interpreter))
+    if main_options_count != 1:
+        fail("must specify exactly one of srcs OR entry_point OR interpreter; specified %d" % (
+            main_options_count))
 
     provider = _get_transitive_provider(ctx)
 
@@ -136,6 +137,7 @@ def _pyz_binary_impl(ctx):
         sources=provider.transitive_src_mappings.to_list(),
         wheels=[f.path for f in provider.transitive_wheels],
         entry_point=ctx.attr.entry_point,
+        interpreter=ctx.attr.interpreter,
         force_unzip=force_unzip,
         force_all_unzip=ctx.attr.force_all_unzip,
     )
@@ -161,6 +163,7 @@ pyz_binary = rule(
     _pyz_binary_impl,
     attrs = _pyz_attrs + {
         "entry_point": attr.string(default=""),
+        "interpreter": attr.bool(default=False),
         # TODO: Should be a common attribute that is propagated correctly?
         # TODO: Keep only one of zip_safe and force_all_unzip
         "zip_safe": attr.bool(default=True),

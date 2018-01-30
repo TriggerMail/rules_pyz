@@ -200,3 +200,14 @@ pyz_test(
     srcs=["print_file_path_test.py"],
     data=[":print_file_path", ":print_file_path_force_all_unzip"],
 )
+
+pyz_binary(
+    name="interpreter",
+    interpreter=True,
+    deps=["//third_party/pypi:google_cloud_datastore"],
+)
+pyz_test(
+    name="interpreter_test",
+    srcs=["interpreter_test.py"],
+    data=[":interpreter"],
+)

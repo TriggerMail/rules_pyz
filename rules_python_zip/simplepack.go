@@ -23,17 +23,19 @@ type manifestSource struct {
 }
 
 type manifest struct {
-	Sources    []manifestSource
-	Wheels     []string
-	EntryPoint string `json:"entry_point"`
+	Sources     []manifestSource
+	Wheels      []string
+	EntryPoint  string `json:"entry_point"`
+	Interpreter bool
 	// TODO: Keep only one of these attributes?
 	ForceUnzip    []string `json:"force_unzip"`
 	ForceAllUnzip bool     `json:"force_all_unzip"`
 }
 
 type mainArgs struct {
-	ScriptPath string
-	EntryPoint string
+	ScriptPath  string
+	EntryPoint  string
+	Interpreter bool
 }
 
 type packageInfo struct {
@@ -122,8 +124,14 @@ func main() {
 		panic(err)
 	}
 
-	if len(zipManifest.Sources) == 0 && zipManifest.EntryPoint == "" {
-		fmt.Fprintln(os.Stderr, "Error: one of Sources or EntryPoint cannot be empty (need a file to execute)")
+	if len(zipManifest.Sources) == 0 && zipManifest.EntryPoint == "" && !zipManifest.Interpreter {
+		fmt.Fprintln(os.Stderr,
+			"Error: one of Sources or EntryPoint cannot be empty or Interpreter must be true")
+		os.Exit(1)
+	}
+	if zipManifest.EntryPoint != "" && zipManifest.Interpreter {
+		fmt.Fprintln(os.Stderr,
+			"Error: only one of EntryPoint OR Interpreter can be set")
 		os.Exit(1)
 	}
 
@@ -166,10 +174,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	args := &mainArgs{}
-	if zipManifest.EntryPoint != "" {
-		args.EntryPoint = zipManifest.EntryPoint
-	} else {
+	args := &mainArgs{
+		EntryPoint:  zipManifest.EntryPoint,
+		Interpreter: zipManifest.Interpreter,
+	}
+	if zipManifest.EntryPoint == "" && !zipManifest.Interpreter {
 		args.ScriptPath = zipManifest.Sources[0].Dst
 	}
 	err = mainTemplate.Execute(writer, args)
@@ -408,7 +417,18 @@ if need_unzip and isinstance(__loader__, zipimport.zipimporter):
             unzipped_dir = os.path.dirname(unzipped_dir)
 
 
-{{if .ScriptPath}}
+{{if or .ScriptPath .Interpreter }}
+{{if .Interpreter }}
+if len(sys.argv) == 1:
+    import code
+    result = code.interact()
+    sys.exit(0)
+else:
+    script_path = sys.argv[1]
+    script_data = open(script_path).read()
+    sys.argv = sys.argv[1:]
+    # fall through to the script execution code below
+{{else}}
 script_path = '{{.ScriptPath}}'
 # load the original script and evaluate it inside this zip
 is_script_unzipped = script_path in package_info['unzip_paths'] or package_info['force_all_unzip']
@@ -421,6 +441,8 @@ else:
     # assumes that __main__ is in the root dir either of a zip or a real dir
     pythonroot = os.path.dirname(__file__)
     script_path = os.path.join(pythonroot, script_path)
+{{end}}
+
 clean_globals['__file__'] = script_path
 
 ast = compile(script_data, script_path, 'exec', flags=0, dont_inherit=1)
