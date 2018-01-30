@@ -13,18 +13,23 @@ Add the following lines to your `WORKSPACE`:
 # Load the dependencies required for the rules
 git_repository(
     name = "com_bluecore_rules_pyz",
+    commit = "a7322c7b32a7e5f924d5f90369384b2dc63abe70",
     remote = "https://github.com/TriggerMail/rules_pyz.git",
-    commit = "a539c6c938db75fa871e8611764f41fc0c35254b",
 )
+
 load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl", "pyz_repositories")
+
 pyz_repositories()
 ```
 
 To each BUILD file where you want to use the rules, add:
 
 ```python
-load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl",
-    "pyz_binary", "pyz_library", "pyz_test",
+load(
+    "@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl",
+    "pyz_binary",
+    "pyz_library",
+    "pyz_test",
 )
 ```
 
