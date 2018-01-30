@@ -53,7 +53,7 @@ If you want to import packages from PyPI, write a pip `requirements.txt` file, t
     bazel build @com_bluecore_rules_pyz//pypi:pip_generate_wrapper
     bazel-bin/external/com_bluecore_rules_pyz/pypi/pip_generate_wrapper \
         -requirements requirements.txt \
-        -output third_party/pypi/pypi_requirements.bzl \
+        -output third_party/pypi/pypi_rules.bzl \
         -wheelURLPrefix http://example.com/
     ```
 
