@@ -56,7 +56,9 @@ func filterUnzipPaths(paths []string) []string {
 	output := []string{}
 	for _, path := range paths {
 		// Versioned shared libs can have names like libffi-45372312.so.6.0.4
-		if strings.HasSuffix(path, ".so") || strings.Contains(path, ".so.") {
+		// Mac libs have both .so and .dylib
+		file := filepath.Base(path)
+		if strings.HasSuffix(file, ".so") || strings.Contains(file, ".so.") || strings.HasSuffix(file, ".dylib") {
 			output = append(output, path)
 		}
 	}

@@ -1,0 +1,6 @@
+# used to generate third_party/pypi/pypi_rules.bzl
+bcrypt
+cryptography
+google-cloud-datastore
+scipy
+virtualenv

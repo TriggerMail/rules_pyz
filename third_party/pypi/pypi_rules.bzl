@@ -9,14 +9,14 @@ def pypi_repositories():
         sha256="2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87",
     )
     native.http_file(
-        name="pypi_bcrypt__osx",
-        url="https://pypi.python.org/packages/a1/9c/c89411a505dca5ae822a28c6de6946583ff8a1d5d9190292f301d28dcf85/bcrypt-3.1.4-cp27-cp27m-macosx_10_6_intel.whl",
-        sha256="0f317e4ffbdd15c3c0f8ab5fbd86aa9aabc7bea18b5cc5951b456fe39e9f738c",
-    )
-    native.http_file(
         name="pypi_bcrypt__linux",
         url="https://pypi.python.org/packages/2e/5a/2abeae20ce294fe6bf63da0e0b5a885c788e1360bbd124edcc0429678a59/bcrypt-3.1.4-cp27-cp27mu-manylinux1_x86_64.whl",
         sha256="2788c32673a2ad0062bea850ab73cffc0dba874db10d7a3682b6f2f280553f20",
+    )
+    native.http_file(
+        name="pypi_bcrypt__osx",
+        url="https://pypi.python.org/packages/a1/9c/c89411a505dca5ae822a28c6de6946583ff8a1d5d9190292f301d28dcf85/bcrypt-3.1.4-cp27-cp27m-macosx_10_6_intel.whl",
+        sha256="0f317e4ffbdd15c3c0f8ab5fbd86aa9aabc7bea18b5cc5951b456fe39e9f738c",
     )
     native.http_file(
         name="pypi_cachetools",
@@ -25,13 +25,8 @@ def pypi_repositories():
     )
     native.http_file(
         name="pypi_certifi",
-        url="https://pypi.python.org/packages/29/9b/25ef61e948321296f029f53c9f67cc2b54e224db509eb67ce17e0df6044a/certifi-2017.11.5-py2.py3-none-any.whl",
-        sha256="244be0d93b71e93fc0a0a479862051414d0e00e16435707e5bf5000f92e04694",
-    )
-    native.http_file(
-        name="pypi_cffi__osx",
-        url="https://pypi.python.org/packages/23/48/5fa86470b70bdc527b5c133926267322ed0752501e63777aef8b4bef633e/cffi-1.11.4-cp27-cp27m-macosx_10_6_intel.whl",
-        sha256="5d0d7023b72794ea847725680e2156d1d01bc698a9007fccce46d03c904fe093",
+        url="https://pypi.python.org/packages/fa/53/0a5562e2b96749e99a3d55d8c7df91c9e4d8c39a9da1f1a49ac9e4f4b39f/certifi-2018.1.18-py2.py3-none-any.whl",
+        sha256="14131608ad2fd56836d33a71ee60fa1c82bc9d2c8d98b7bdbc631fe1b3cd1296",
     )
     native.http_file(
         name="pypi_cffi__linux",
@@ -39,19 +34,24 @@ def pypi_repositories():
         sha256="6ca52651f6bd4b8647cb7dee15c82619de3e13490f8e0bc0620830a2245b51d1",
     )
     native.http_file(
+        name="pypi_cffi__osx",
+        url="https://pypi.python.org/packages/23/48/5fa86470b70bdc527b5c133926267322ed0752501e63777aef8b4bef633e/cffi-1.11.4-cp27-cp27m-macosx_10_6_intel.whl",
+        sha256="5d0d7023b72794ea847725680e2156d1d01bc698a9007fccce46d03c904fe093",
+    )
+    native.http_file(
         name="pypi_chardet",
         url="https://pypi.python.org/packages/bc/a9/01ffebfb562e4274b6487b4bb1ddec7ca55ec7510b22e4c51f14098443b8/chardet-3.0.4-py2.py3-none-any.whl",
         sha256="fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691",
     )
     native.http_file(
-        name="pypi_cryptography__osx",
-        url="https://pypi.python.org/packages/a4/3d/2a7557a5f75007f1378813a60643fe76c38ec94b7a26c867935e3d55f7d2/cryptography-2.1.4-cp27-cp27m-macosx_10_6_intel.whl",
-        sha256="69285f5615507b6625f89ea1048addd1d9218585fb886eb90bdebb1d2b2d26f5",
-    )
-    native.http_file(
         name="pypi_cryptography__linux",
         url="https://pypi.python.org/packages/69/7b/05067e7c4d1a287c0be040e46ef70b8dfd7a809af8afcfbcc1b60e801ebc/cryptography-2.1.4-cp27-cp27mu-manylinux1_x86_64.whl",
         sha256="fc2208d95d9ecc8032f5e38330d5ace2e3b0b998e42b08c30c35b2ab3a4a3bc8",
+    )
+    native.http_file(
+        name="pypi_cryptography__osx",
+        url="https://pypi.python.org/packages/a4/3d/2a7557a5f75007f1378813a60643fe76c38ec94b7a26c867935e3d55f7d2/cryptography-2.1.4-cp27-cp27m-macosx_10_6_intel.whl",
+        sha256="69285f5615507b6625f89ea1048addd1d9218585fb886eb90bdebb1d2b2d26f5",
     )
     native.http_file(
         name="pypi_dill",
@@ -109,14 +109,14 @@ def pypi_repositories():
         sha256="688b20bc1a70a6ae3178ee296adb8bb0d04f64e2734c528b302c7024bf2abb7d",
     )
     native.http_file(
-        name="pypi_grpcio__osx",
-        url="https://pypi.python.org/packages/8b/5d/dcaf097fc9b7ab39babf4f9f4055e622f6a59e486a31bbd03c48754c36ef/grpcio-1.8.4-cp27-cp27m-macosx_10_10_intel.whl",
-        sha256="dd1a1a0e20e9708d7724d52dbeaef4a43ac40c4a5d5b791cbb894e7698351f97",
+        name="pypi_grpcio__linux",
+        url="https://pypi.python.org/packages/5a/65/ba4c484cbaa2a42e514520a3db3c150689b25dfd30d5d8dae00691cf736b/grpcio-1.8.6-cp27-cp27mu-manylinux1_x86_64.whl",
+        sha256="f271540008500e877cbcdf794a636ca23b443f7d0109ef15af4c5df37faf461c",
     )
     native.http_file(
-        name="pypi_grpcio__linux",
-        url="https://pypi.python.org/packages/9c/9a/4c09b5370c362cef2c4d8bc9c807ecfa0f518c06430e43e8c60cfa7bc39e/grpcio-1.8.4-cp27-cp27mu-manylinux1_x86_64.whl",
-        sha256="8a425fbf0a9a966cd45c49a6657a3db8fc962297d85d8c53795918cba5d981a0",
+        name="pypi_grpcio__osx",
+        url="https://pypi.python.org/packages/03/8c/cc94c01352a351da9eeac440e069e2b0029f195cea3fcc2b8edce2250115/grpcio-1.8.6-cp27-cp27m-macosx_10_10_intel.whl",
+        sha256="a30ee70f4abe59b8318bfa90d48a8eb1806b2ce09a37cdc202b36834cec553d0",
     )
     native.http_file(
         name="pypi_httplib2",
@@ -132,6 +132,16 @@ def pypi_repositories():
         name="pypi_ipaddress",
         url="https://storage.googleapis.com/bluecore-bazel/ipaddress-1.0.19-py2-none-any.whl",
         sha256="c6462e3a74c6294b5ec5ab5ec6abb871329436c433642fc0f71df1f3959cc73f",
+    )
+    native.http_file(
+        name="pypi_numpy__linux",
+        url="https://pypi.python.org/packages/0d/8a/e0223a40f980e0442a2045dcf79e4a8a90339593525599a0add318da2428/numpy-1.14.0-cp27-cp27mu-manylinux1_x86_64.whl",
+        sha256="75471acf298d455b035226cc609a92aee42c4bb6aa71def85f77fa2c2b646b61",
+    )
+    native.http_file(
+        name="pypi_numpy__osx",
+        url="https://pypi.python.org/packages/2a/d6/80e808ae7963cdfe579eea7a22de4e606438907984572927f0b7057cb424/numpy-1.14.0-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl",
+        sha256="428cd3c0b197cf857671353d8c85833193921af9fafcc169a1f29c7185833d50",
     )
     native.http_file(
         name="pypi_oauth2client",
@@ -184,6 +194,16 @@ def pypi_repositories():
         sha256="43f682fea81c452c98d09fc316aae12de6d30c4b5c84226642cf8f8fd1c93abd",
     )
     native.http_file(
+        name="pypi_scipy__linux",
+        url="https://pypi.python.org/packages/36/cd/cb310bed153d23f89427f642d52cb74c8465c1b02c3302a89c9c0abd93ce/scipy-1.0.0-cp27-cp27mu-manylinux1_x86_64.whl",
+        sha256="bf36f3485e7b7291c36330a93bbfd4f5e8db23bbe4ea46c37b2839fef463f4e2",
+    )
+    native.http_file(
+        name="pypi_scipy__osx",
+        url="https://pypi.python.org/packages/4d/e4/e92135b070c0913cbee59849b61f57076ac33d8a754be0fef581a28676f9/scipy-1.0.0-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl",
+        sha256="70e6fc3f2f52c9152f05e27eb9bd8543cb862cacb71f8521a571e4ffb837f450",
+    )
+    native.http_file(
         name="pypi_six",
         url="https://pypi.python.org/packages/67/4b/141a581104b1f6397bfa78ac9d43d8ad29a7ca43ea90a2d863fe3056e86a/six-1.11.0-py2.py3-none-any.whl",
         sha256="832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb",
@@ -205,21 +225,19 @@ def pypi_libraries():
         wheels=["@pypi_asn1crypto//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
     pyz_library(
         name="bcrypt",
         wheels=select({
-                "//rules_python_zip:osx": ["@pypi_bcrypt__osx//file"],
                 "//rules_python_zip:linux": ["@pypi_bcrypt__linux//file"],
+                "//rules_python_zip:osx": ["@pypi_bcrypt__osx//file"],
         }),
         deps=[
             "cffi",
             "six",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -228,7 +246,6 @@ def pypi_libraries():
         wheels=["@pypi_cachetools//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -237,20 +254,18 @@ def pypi_libraries():
         wheels=["@pypi_certifi//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
     pyz_library(
         name="cffi",
         wheels=select({
-                "//rules_python_zip:osx": ["@pypi_cffi__osx//file"],
                 "//rules_python_zip:linux": ["@pypi_cffi__linux//file"],
+                "//rules_python_zip:osx": ["@pypi_cffi__osx//file"],
         }),
         deps=[
             "pycparser",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -259,15 +274,14 @@ def pypi_libraries():
         wheels=["@pypi_chardet//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
     pyz_library(
         name="cryptography",
         wheels=select({
-                "//rules_python_zip:osx": ["@pypi_cryptography__osx//file"],
                 "//rules_python_zip:linux": ["@pypi_cryptography__linux//file"],
+                "//rules_python_zip:osx": ["@pypi_cryptography__osx//file"],
         }),
         deps=[
             "asn1crypto",
@@ -277,7 +291,6 @@ def pypi_libraries():
             "enum34",
             "ipaddress",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -286,7 +299,6 @@ def pypi_libraries():
         wheels=["@pypi_dill//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -295,7 +307,6 @@ def pypi_libraries():
         wheels=["@pypi_enum34//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -304,7 +315,6 @@ def pypi_libraries():
         wheels=["@pypi_future//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -313,7 +323,6 @@ def pypi_libraries():
         wheels=["@pypi_futures//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -326,7 +335,6 @@ def pypi_libraries():
             "oauth2client",
             "proto_google_cloud_datastore_v1__grpc",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -343,7 +351,6 @@ def pypi_libraries():
             "six",
             "futures",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -365,7 +372,6 @@ def pypi_libraries():
             "rsa",
             "six",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -375,7 +381,6 @@ def pypi_libraries():
         deps=[
             "google_api_core",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -397,7 +402,6 @@ def pypi_libraries():
             "google_cloud_core",
             "google_gax",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -414,7 +418,6 @@ def pypi_libraries():
             "protobuf",
             "requests",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -424,7 +427,6 @@ def pypi_libraries():
         deps=[
             "protobuf",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -440,8 +442,8 @@ def pypi_libraries():
     pyz_library(
         name="grpcio",
         wheels=select({
-                "//rules_python_zip:osx": ["@pypi_grpcio__osx//file"],
                 "//rules_python_zip:linux": ["@pypi_grpcio__linux//file"],
+                "//rules_python_zip:osx": ["@pypi_grpcio__osx//file"],
         }),
         deps=[
             "enum34",
@@ -449,7 +451,6 @@ def pypi_libraries():
             "protobuf",
             "six",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -458,7 +459,6 @@ def pypi_libraries():
         wheels=["@pypi_httplib2//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -467,7 +467,6 @@ def pypi_libraries():
         wheels=["@pypi_idna//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -476,7 +475,17 @@ def pypi_libraries():
         wheels=["@pypi_ipaddress//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
+        licenses=["notice"],
+        visibility=["//visibility:public"],
+    )
+    pyz_library(
+        name="numpy",
+        wheels=select({
+                "//rules_python_zip:linux": ["@pypi_numpy__linux//file"],
+                "//rules_python_zip:osx": ["@pypi_numpy__osx//file"],
+        }),
+        deps=[
+        ],
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -490,7 +499,6 @@ def pypi_libraries():
             "rsa",
             "six",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -499,7 +507,6 @@ def pypi_libraries():
         wheels=["@pypi_ply//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -510,7 +517,6 @@ def pypi_libraries():
             "googleapis_common_protos",
             "oauth2client",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -531,7 +537,6 @@ def pypi_libraries():
             "setuptools",
             "six",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -540,7 +545,6 @@ def pypi_libraries():
         wheels=["@pypi_pyasn1//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -550,7 +554,6 @@ def pypi_libraries():
         deps=[
             "pyasn1",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -559,7 +562,6 @@ def pypi_libraries():
         wheels=["@pypi_pycparser//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -568,7 +570,6 @@ def pypi_libraries():
         wheels=["@pypi_pytz//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -581,7 +582,6 @@ def pypi_libraries():
             "idna",
             "urllib3",
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -591,7 +591,18 @@ def pypi_libraries():
         deps=[
             "pyasn1",
         ],
-        # Not the correct license but fixes a build error
+        licenses=["notice"],
+        visibility=["//visibility:public"],
+    )
+    pyz_library(
+        name="scipy",
+        wheels=select({
+                "//rules_python_zip:linux": ["@pypi_scipy__linux//file"],
+                "//rules_python_zip:osx": ["@pypi_scipy__osx//file"],
+        }),
+        deps=[
+            "numpy",
+        ],
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -600,7 +611,6 @@ def pypi_libraries():
         wheels=["@pyz_setuptools_whl//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -626,7 +636,6 @@ def pypi_libraries():
         wheels=["@pypi_six//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -635,7 +644,6 @@ def pypi_libraries():
         wheels=["@pypi_urllib3//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )
@@ -644,7 +652,6 @@ def pypi_libraries():
         wheels=["@pypi_virtualenv//file"],
         deps=[
         ],
-        # Not the correct license but fixes a build error
         licenses=["notice"],
         visibility=["//visibility:public"],
     )

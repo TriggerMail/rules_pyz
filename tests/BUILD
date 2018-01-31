@@ -211,3 +211,9 @@ pyz_test(
     srcs=["interpreter_test.py"],
     data=[":interpreter"],
 )
+
+pyz_test(
+    name="scipy_test",
+    srcs=["scipy_test.py"],
+    deps=["//third_party/pypi:scipy"],
+)
