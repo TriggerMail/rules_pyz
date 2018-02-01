@@ -212,8 +212,22 @@ pyz_test(
     data=[":interpreter"],
 )
 
+# Tests a complicated native code dependency
 pyz_test(
     name="scipy_test",
     srcs=["scipy_test.py"],
     deps=["//third_party/pypi:scipy"],
+)
+
+# Tests the interpreter_path attribute
+pyz_binary(
+    name="interpreter_path",
+    srcs=["interpreter_path.py"],
+    interpreter_path="/usr/bin/python2.7",
+)
+pyz_test(
+    name="interpreter_path_test",
+    srcs=["interpreter_path_test.py"],
+    #interpreter_path="/usr/bin/python2.7",
+    data=[":interpreter_path"],
 )

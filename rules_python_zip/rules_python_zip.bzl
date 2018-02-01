@@ -118,14 +118,6 @@ def _pyz_binary_impl(ctx):
 
     provider = _get_transitive_provider(ctx)
 
-    # flatten the transitive mappings and output the manifest with srcs and wheels
-    # sources = []
-    # for mapping in provider.transitive_src_mappings:
-    #     input_files += mapping.src
-    #     sources.append(struct(
-    #         src=mapping.src,
-    #         dst=mapping.dst,
-    #     ))
     force_unzip = []
     if not ctx.attr.zip_safe:
         # force all srcs and data to be unzipped
@@ -138,6 +130,7 @@ def _pyz_binary_impl(ctx):
         wheels=[f.path for f in provider.transitive_wheels],
         entry_point=ctx.attr.entry_point,
         interpreter=ctx.attr.interpreter,
+        interpreter_path=ctx.attr.interpreter_path,
         force_unzip=force_unzip,
         force_all_unzip=ctx.attr.force_all_unzip,
     )
@@ -163,7 +156,13 @@ pyz_binary = rule(
     _pyz_binary_impl,
     attrs = _pyz_attrs + {
         "entry_point": attr.string(default=""),
+
+        # If True, act like a Python interpreter: interactive shell or execute scripts
         "interpreter": attr.bool(default=False),
+
+        # Path to the Python interpreter to write as the #! line on the zip.
+        "interpreter_path": attr.string(default=""),
+
         # TODO: Should be a common attribute that is propagated correctly?
         # TODO: Keep only one of zip_safe and force_all_unzip
         "zip_safe": attr.bool(default=True),

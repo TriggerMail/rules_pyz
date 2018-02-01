@@ -14,7 +14,7 @@ import (
 
 // TODO: Make store/deflate toggleable? Store should be faster
 const zipMethod = zip.Store
-const interpreterLine = "#!/usr/bin/env python2.7\n"
+const defaultInterpreterLine = "/usr/bin/env python2.7"
 const zipInfoPath = "_zip_info_.json"
 
 type manifestSource struct {
@@ -23,10 +23,11 @@ type manifestSource struct {
 }
 
 type manifest struct {
-	Sources     []manifestSource
-	Wheels      []string
-	EntryPoint  string `json:"entry_point"`
-	Interpreter bool
+	Sources         []manifestSource
+	Wheels          []string
+	EntryPoint      string `json:"entry_point"`
+	Interpreter     bool
+	InterpreterPath string `json:"interpreter_path"`
 	// TODO: Keep only one of these attributes?
 	ForceUnzip    []string `json:"force_unzip"`
 	ForceAllUnzip bool     `json:"force_all_unzip"`
@@ -142,7 +143,15 @@ func main() {
 		panic(err)
 	}
 	defer outFile.Close()
-	outFile.Write([]byte(interpreterLine))
+	if zipManifest.InterpreterPath == "" {
+		zipManifest.InterpreterPath = defaultInterpreterLine
+	}
+	if strings.ContainsAny(zipManifest.InterpreterPath, "#!\n") {
+		panic(fmt.Errorf("Invalid InterpreterPath:%#v", zipManifest.InterpreterPath))
+	}
+	outFile.Write([]byte("#!"))
+	outFile.Write([]byte(zipManifest.InterpreterPath))
+	outFile.Write([]byte("\n"))
 	zipWriter := newCachedPathsZipWriter(outFile)
 	defer zipWriter.Close()
 
