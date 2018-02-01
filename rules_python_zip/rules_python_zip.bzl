@@ -202,13 +202,16 @@ _pyz_script_test = rule(
             default="//rules_python_zip:pytest_template.sh",
             allow_single_file=True,
         ),
+
+        # required so the pyz_test can be used in third_party without error
+        "licenses": attr.license(),
     },
     executable = True,
     test = True,
 )
 
 
-def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False):
+def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False, licenses=[]):
     '''Macro that outputs a pyz_binary with all the test code and executes it with a shell script
     to pass the correct arguments.'''
 
@@ -222,6 +225,7 @@ def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False):
         entry_point = "pytest",
         testonly = True,
         force_all_unzip = force_all_unzip,
+        licenses = licenses,
     )
 
     _pyz_script_test(
@@ -229,6 +233,7 @@ def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False):
         srcs = srcs,
         data = data,
         compiled_deps = compiled_deps_name,
+        licenses = licenses,
     )
 
 
