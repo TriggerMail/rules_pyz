@@ -79,7 +79,7 @@ def _get_transitive_provider(ctx):
             if dst.startswith("../"):
                 dst = dst[3:]
 
-            if f.short_path.startswith(prefix):
+            if dst.startswith(prefix):
                 dst = dst[len(prefix):]
             src_mapping.append(struct(src=f.path, dst=dst))
 
