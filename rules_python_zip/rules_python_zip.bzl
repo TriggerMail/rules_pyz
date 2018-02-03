@@ -3,7 +3,7 @@ wheel_file_types = FileType([".whl"])
 
 
 _PyZProvider = provider(fields=[
-    "transitive_src_mappings", "transitive_srcs", "transitive_wheels"])
+    "transitive_src_mappings", "transitive_srcs", "transitive_wheels", "transitive_force_unzip"])
 
 _pyz_attrs = {
     "srcs": attr.label_list(
@@ -25,6 +25,10 @@ _pyz_attrs = {
         allow_single_file=True,
         default=Label("//tools:simplepack")),
     "data": attr.label_list(allow_files = True, cfg = "data"),
+
+    # this target's direct files must be unzipped to be executed. This is usually
+    # because Python code relies on __file__ relative paths existing.
+    "zip_safe": attr.bool(default=True),
 
     # required so the rules can be used in third_party without error:
     # third-party rule '//third_party/pypi:example' lacks a license declaration
@@ -64,12 +68,25 @@ def get_pythonroot(ctx):
     return pythonroot
 
 
+def _get_destination_path(prefix, file):
+    destination = file.short_path
+    # external repositories have paths like "../repository_name/"
+    if destination.startswith("../"):
+        destination = destination[3:]
+
+    if destination.startswith(prefix):
+        destination = destination[len(prefix):]
+    return destination
+
+
 def _get_transitive_provider(ctx):
     # build the mapping from source to destinations for this rule
     pythonroot = get_pythonroot(ctx)
-    prefix = "####notaprefix#####"
+    prefix = "####notaprefix#####/"
     if pythonroot != None:
         prefix = pythonroot + "/"
+    if not prefix.endswith("/"):
+        fail("prefix must end with /: " + repr(prefix))
     src_mapping = []
     # treat srcs and data the same: no real reason to separate them?
     for files_attr in (ctx.files.srcs, ctx.files.data):
@@ -87,15 +104,22 @@ def _get_transitive_provider(ctx):
     transitive_src_mappings = depset(direct=src_mapping)
     transitive_srcs = depset(direct=ctx.files.srcs + ctx.files.data)
     transitive_wheels = depset(direct=ctx.files.wheels)
+    force_unzips = []
+    if not ctx.attr.zip_safe:
+        # not zip safe: list all the files in this target as requiring unzipping
+        force_unzips = [m.dst for m in src_mapping]
+    transitive_force_unzip = depset(direct=force_unzips)
     for dep in ctx.attr.deps:
         transitive_src_mappings += dep[_PyZProvider].transitive_src_mappings
         transitive_srcs += dep[_PyZProvider].transitive_srcs
         transitive_wheels += dep[_PyZProvider].transitive_wheels
+        transitive_force_unzip += dep[_PyZProvider].transitive_force_unzip
 
     return _PyZProvider(
         transitive_src_mappings=transitive_src_mappings,
         transitive_srcs=transitive_srcs,
         transitive_wheels=transitive_wheels,
+        transitive_force_unzip=transitive_force_unzip,
     )
 
 
@@ -118,20 +142,13 @@ def _pyz_binary_impl(ctx):
 
     provider = _get_transitive_provider(ctx)
 
-    force_unzip = []
-    if not ctx.attr.zip_safe:
-        # force all srcs and data to be unzipped
-        # TODO: apply to pyz_library
-        for files_attr in (ctx.files.srcs, ctx.files.data):
-            force_unzip.extend([f.short_path for f in files_attr])
-
     manifest = struct(
         sources=provider.transitive_src_mappings.to_list(),
         wheels=[f.path for f in provider.transitive_wheels],
         entry_point=ctx.attr.entry_point,
         interpreter=ctx.attr.interpreter,
         interpreter_path=ctx.attr.interpreter_path,
-        force_unzip=force_unzip,
+        force_unzip=provider.transitive_force_unzip.to_list(),
         force_all_unzip=ctx.attr.force_all_unzip,
     )
 
@@ -163,9 +180,7 @@ pyz_binary = rule(
         # Path to the Python interpreter to write as the #! line on the zip.
         "interpreter_path": attr.string(default=""),
 
-        # TODO: Should be a common attribute that is propagated correctly?
-        # TODO: Keep only one of zip_safe and force_all_unzip
-        "zip_safe": attr.bool(default=True),
+        # Forces the contents of the pyz_binary to be extracted and run from a temp dir.
         "force_all_unzip": attr.bool(default=False),
     },
     executable = True,
