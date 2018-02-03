@@ -1,0 +1,8 @@
+# Bazel defaults
+# https://docs.bazel.build/versions/master/user-manual.html#bazelrc
+
+# Force a "sane" default PATH for Bazel commands
+# The default can cause errors if a Python virtualenv is activated.
+# TODO: rules_pyz should be robust to this. In particular, it possibly should
+# not import site, which would avoid executing .pth files
+build --experimental_strict_action_env=true
