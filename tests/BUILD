@@ -244,3 +244,13 @@ pyz_library(
     # previously caused a SyntaxError because it moved the coding directive
     zip_safe=False,
 )
+
+sh_test(
+    name="fork_test",
+    srcs=[":fork_test_bin"],
+)
+pyz_binary(
+    name="fork_test_bin",
+    srcs=["fork_test.py"],
+    deps=[":coding"]
+)

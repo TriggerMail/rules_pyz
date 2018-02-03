@@ -299,7 +299,7 @@ clean_globals = dict(globals())
 
 
 import json
-import os.path
+import os
 import sys
 import zipimport
 
@@ -382,8 +382,15 @@ def _copy_as_namespace(tempdir, unzipped_dir):
             # ziploader.get_data raises this if the file does not exist
             f.write(__NAMESPACE_LINE)
 
+def clean_tempdir_parent_only(path):
+    '''Only delete the tempdir in the original process even in case of fork.'''
+    if os.getpid() == tempdir_create_pid:
+        shutil.rmtree(path)
+
+
 package_info = _read_package_info()
 tempdir = None
+tempdir_create_pid = None
 need_unzip = len(package_info['unzip_paths']) > 0 or package_info['force_all_unzip']
 if need_unzip and isinstance(__loader__, zipimport.zipimporter):
     # do not import these modules unless we have to
@@ -396,7 +403,8 @@ if need_unzip and isinstance(__loader__, zipimport.zipimporter):
     # create the dir and clean it up atexit:
     # can't use a finally handler: it gets invoked BEFORE tracebacks are printed
     tempdir = tempfile.mkdtemp('_pyzip')
-    atexit.register(shutil.rmtree, tempdir)
+    tempdir_create_pid = os.getpid()
+    atexit.register(clean_tempdir_parent_only, tempdir)
 
     package_zip = zipfile.ZipFile(__loader__.archive)
     files_to_unzip = package_info['unzip_paths']
