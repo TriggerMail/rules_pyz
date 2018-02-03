@@ -369,6 +369,13 @@ def _copy_as_namespace(tempdir, unzipped_dir):
             for i, line in enumerate(lines):
                 if '__future__' in line:
                     last_future_line = i
+            # if we don't find future, must insert after any "coding" directive, which must be
+            # in the first two lines. Just insert after the first two lines of comments
+            if last_future_line == -1:
+                if len(lines) > 0 and lines[0].startswith('#'):
+                    last_future_line = 0
+                if len(lines) > 1 and lines[1].startswith('#'):
+                    last_future_line = 1
             lines.insert(last_future_line+1, __NAMESPACE_LINE)
             f.write('\n'.join(lines))
         except IOError:

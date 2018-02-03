@@ -231,3 +231,16 @@ pyz_test(
     #interpreter_path="/usr/bin/python2.7",
     data=[":interpreter_path"],
 )
+
+pyz_test(
+    name="init_rewrite_test",
+    srcs=["init_rewrite_test.py"],
+    deps=[":coding"],
+)
+pyz_library(
+    name="coding",
+    srcs=["coding/__init__.py"],
+    # force this to be unpacked, which triggers rewriting the __init__ file
+    # previously caused a SyntaxError because it moved the coding directive
+    zip_safe=False,
+)
