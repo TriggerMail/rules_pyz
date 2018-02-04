@@ -405,13 +405,22 @@ if need_unzip and isinstance(__loader__, zipimport.zipimporter):
     tempdir = tempfile.mkdtemp('_pyzip')
     tempdir_create_pid = os.getpid()
     atexit.register(clean_tempdir_parent_only, tempdir)
+    sys.path.insert(0, tempdir)
 
     package_zip = zipfile.ZipFile(__loader__.archive)
     files_to_unzip = package_info['unzip_paths']
     if package_info['force_all_unzip']:
         files_to_unzip = None
+    else:
+        # pkg_resources finds our zip as an egg and can mess with sys.path:
+        # make sure it doesn't do that by changing EGG_DIST precedence
+        # needed to make google.cloud.datastore and gunicorn play nice
+        try:
+            import pkg_resources
+            pkg_resources.EGG_DIST = pkg_resources.DEVELOP_DIST-1
+        except ImportError:
+            pass
     package_zip.extractall(path=tempdir, members=files_to_unzip)
-    sys.path.insert(0, tempdir)
 
     # pkgutil.extend_path does not add zips to __path__; hack a function that will
     # register it as a module so it can be referenced from random __init__.py

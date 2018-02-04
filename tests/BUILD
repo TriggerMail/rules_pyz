@@ -254,3 +254,16 @@ pyz_binary(
     srcs=["fork_test.py"],
     deps=[":coding"]
 )
+
+pyz_binary(
+    name="pkg_resources_weirdness",
+    srcs=["pkg_resources_weirdness.py"],
+    deps=[
+        "//third_party/pypi:google_cloud_datastore",
+    ],
+)
+pyz_test(
+    name="pkg_resources_weirdness_test",
+    srcs=["pkg_resources_weirdness_test.py"],
+    data=[":pkg_resources_weirdness"],
+)
