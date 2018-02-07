@@ -267,3 +267,9 @@ pyz_test(
     srcs=["pkg_resources_weirdness_test.py"],
     data=[":pkg_resources_weirdness"],
 )
+
+pyz_test(
+    name="grpc_ssl_test",
+    srcs=["grpc_ssl_test.py"],
+    deps=["//third_party/pypi:google_cloud_datastore"],
+)

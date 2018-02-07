@@ -54,13 +54,31 @@ func zipCreateWithMethod(z *zip.Writer, name string) (io.Writer, error) {
 
 // Returns the list of paths that need to be unzipped.
 func filterUnzipPaths(paths []string) []string {
-	output := []string{}
+	// find directories containing native code
+	nativeLibDirs := map[string]bool{}
 	for _, path := range paths {
 		// Versioned shared libs can have names like libffi-45372312.so.6.0.4
 		// Mac libs have both .so and .dylib
 		file := filepath.Base(path)
 		if strings.HasSuffix(file, ".so") || strings.Contains(file, ".so.") || strings.HasSuffix(file, ".dylib") {
-			output = append(output, path)
+			nativeLibDirs[filepath.Dir(path)] = true
+		}
+	}
+
+	// unzip all non-Python things in dirs containing native code, in case the code references it.
+	// E.g. gRPC needs to find certificates in a sub dir
+	output := []string{}
+	for _, path := range paths {
+		// Leave python files in the zip
+		if strings.HasSuffix(path, ".py") || strings.HasSuffix(path, ".pyc") || strings.HasSuffix(path, ".pyo") {
+			continue
+		}
+
+		for nativeLibDir := range nativeLibDirs {
+			if strings.HasPrefix(path, nativeLibDir+"/") || (nativeLibDir == "." && !strings.ContainsRune(path, '/')) {
+				output = append(output, path)
+				break
+			}
 		}
 	}
 	return output
@@ -441,16 +459,23 @@ if need_unzip and isinstance(__loader__, zipimport.zipimporter):
         return paths
     namespace_hack_module.extend_path_zip = extend_path_zip
 
+    # generate the set of directories that contain Python packages
+    py_dirs = set()
+    for zip_path in package_zip.namelist():
+        if zip_path.endswith('.py') or zip_path.endswith('.pyc') or zip_path.endswith('.pyo'):
+            py_dirs.add(os.path.dirname(zip_path))
+
     # make the unzipped directories namespace packages, all the way to the root
     # TODO: Should this be pre-processed at build time to avoid duplicate runtime work?
     inits = set()
     for unzipped_path in package_info['unzip_paths']:
         unzipped_dir = os.path.dirname(unzipped_path)
         while unzipped_dir != '' and unzipped_dir not in inits:
-            inits.add(unzipped_dir)
-            _copy_as_namespace(tempdir, unzipped_dir)
+            # only create inits if the dir contains python code
+            if unzipped_dir in py_dirs:
+                inits.add(unzipped_dir)
+                _copy_as_namespace(tempdir, unzipped_dir)
             unzipped_dir = os.path.dirname(unzipped_dir)
-
 
 {{if or .ScriptPath .Interpreter }}
 {{if .Interpreter }}
