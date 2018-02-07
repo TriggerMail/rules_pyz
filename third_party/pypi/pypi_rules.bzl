@@ -252,6 +252,7 @@ def pypi_libraries():
     pyz_library(
         name="certifi",
         wheels=["@pypi_certifi//file"],
+        zip_safe=False,
         deps=[
         ],
         licenses=["notice"],

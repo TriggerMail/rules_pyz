@@ -249,6 +249,10 @@ func main() {
 				panic(err)
 			}
 		}
+		err = reader.Close()
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	// Add __init__.py for any directories that contain python code and do not contain it
@@ -283,13 +287,29 @@ func main() {
 	}
 
 	// verify that the unzip paths are sane
+	unzipPaths := []string{}
 	for _, forceUnzipPath := range zipManifest.ForceUnzip {
-		if !zipWriter.paths[forceUnzipPath] {
+		// forceUnzipPaths might be wheels
+		if strings.HasSuffix(forceUnzipPath, ".whl") {
+			reader, err := zip.OpenReader(forceUnzipPath)
+			if err != nil {
+				panic(err)
+			}
+			for _, wheelF := range reader.File {
+				unzipPaths = append(unzipPaths, wheelF.Name)
+			}
+			err = reader.Close()
+			if err != nil {
+				panic(err)
+			}
+		} else if !zipWriter.Contains(forceUnzipPath) {
 			fmt.Fprintf(os.Stderr, "Error: force_unzip path %s does not exist\n", forceUnzipPath)
 			os.Exit(1)
+		} else {
+			unzipPaths = append(unzipPaths, forceUnzipPath)
 		}
 	}
-	unzipPaths := zipManifest.ForceUnzip
+
 	if zipManifest.ForceAllUnzip {
 		// don't list paths if we are going to unzip all
 		unzipPaths = []string{}

@@ -273,3 +273,9 @@ pyz_test(
     srcs=["grpc_ssl_test.py"],
     deps=["//third_party/pypi:google_cloud_datastore"],
 )
+
+pyz_test(
+    name="certifi_path_test",
+    srcs=["certifi_path_test.py"],
+    deps=["//third_party/pypi:certifi"],
+)

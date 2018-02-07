@@ -39,6 +39,11 @@ var pyPIPlatforms = []struct {
 	{"linux", "-cp27-cp27mu-manylinux1_x86_64."},
 }
 
+// PyPI package names that cannot run correctly inside a zip
+var unzipPackages = map[string]bool{
+	"certifi": true, // returns paths to the contained .pem files
+}
+
 type ruleTypeGenerator struct {
 	libraryRule    string
 	wheelAttribute string
@@ -469,6 +474,10 @@ func main() {
 					selectPlatform, wheelInfo.bazelWorkspaceName())
 			}
 			fmt.Fprintf(outputBzl, "        }),\n")
+		}
+
+		if unzipPackages[dependency.name] {
+			fmt.Fprintf(outputBzl, "        zip_safe=False,\n")
 		}
 
 		fmt.Fprintf(outputBzl, "        deps=[\n")

@@ -108,6 +108,9 @@ def _get_transitive_provider(ctx):
     if not ctx.attr.zip_safe:
         # not zip safe: list all the files in this target as requiring unzipping
         force_unzips = [m.dst for m in src_mapping]
+        # Also list the wheel contents as needing unzipping
+        # TODO: Make this a separate attribute?
+        force_unzips += [f.path for f in ctx.files.wheels]
     transitive_force_unzip = depset(direct=force_unzips)
     for dep in ctx.attr.deps:
         transitive_src_mappings += dep[_PyZProvider].transitive_src_mappings

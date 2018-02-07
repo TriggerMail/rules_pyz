@@ -13,7 +13,7 @@ Add the following lines to your `WORKSPACE`:
 # Load the dependencies required for the rules
 git_repository(
     name = "com_bluecore_rules_pyz",
-    commit = "a7322c7b32a7e5f924d5f90369384b2dc63abe70",
+    commit = "ed9b59ab2979dc87bcd84fbc94ad520b6eaac4dd",
     remote = "https://github.com/TriggerMail/rules_pyz.git",
 )
 
@@ -41,7 +41,7 @@ Instead of `py_*` rules, use `pyz_*`. They should work more or less the same way
 If you want to import packages from PyPI, write a pip `requirements.txt` file, then:
 
 1. `mkdir -p third_party/pypi`
-2. Add the folling lines to `third_party/pypi/BUILD`:
+2. Add the following lines to `third_party/pypi/BUILD`:
     ```python
     load(":pypi_rules.bzl", "pypi_libraries")
     pypi_libraries()
