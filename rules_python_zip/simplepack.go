@@ -52,6 +52,10 @@ func zipCreateWithMethod(z *zip.Writer, name string) (io.Writer, error) {
 	return z.CreateHeader(&header)
 }
 
+func isPyFile(path string) bool {
+	return strings.HasSuffix(path, ".py") || strings.HasSuffix(path, ".pyc") || strings.HasSuffix(path, ".pyo")
+}
+
 // Returns the list of paths that need to be unzipped.
 func filterUnzipPaths(paths []string) []string {
 	// find directories containing native code
@@ -70,7 +74,7 @@ func filterUnzipPaths(paths []string) []string {
 	output := []string{}
 	for _, path := range paths {
 		// Leave python files in the zip
-		if strings.HasSuffix(path, ".py") || strings.HasSuffix(path, ".pyc") || strings.HasSuffix(path, ".pyo") {
+		if isPyFile(path) {
 			continue
 		}
 
@@ -118,7 +122,13 @@ func (c *cachedPathsZipWriter) Paths() []string {
 	for path, _ := range c.paths {
 		out = append(out, path)
 	}
+	// ensure deterministic output
+	sort.Strings(out)
 	return out
+}
+
+func (c *cachedPathsZipWriter) Contains(path string) bool {
+	return c.paths[path]
 }
 
 func main() {
@@ -247,7 +257,7 @@ func main() {
 	// .pth files
 	dirsWithPython := map[string]bool{}
 	for path, _ := range zipWriter.paths {
-		if strings.HasSuffix(path, ".py") {
+		if isPyFile(path) {
 			dir := filepath.Dir(path)
 			for dir != "." && !dirsWithPython[dir] {
 				dirsWithPython[dir] = true

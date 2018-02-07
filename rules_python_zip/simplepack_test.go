@@ -1,6 +1,9 @@
 package main
 
 import (
+	"archive/zip"
+	"io/ioutil"
+	"os"
 	"reflect"
 
 	"testing"
@@ -62,5 +65,41 @@ func TestFilterUnzipPaths(t *testing.T) {
 	out = filterUnzipPaths(paths)
 	if !reflect.DeepEqual(out, expected) {
 		t.Errorf("filterUnzipPaths(%#v)=%#v; expected %#v", paths, out, expected)
+	}
+}
+
+func TestZipWriter(t *testing.T) {
+	tempFile, err := ioutil.TempFile("", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(tempFile.Name())
+	defer tempFile.Close()
+	zw := newCachedPathsZipWriter(tempFile)
+	createPaths := []string{"aaa.txt", "bbb.txt", "ccc.txt", "zzz.txt"}
+	for _, path := range createPaths {
+		if zw.Contains(path) {
+			t.Error("should not contain path: ", path)
+		}
+		_, err = zw.CreateWithMethod(path, zip.Store)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	err = zw.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// ensure Paths is deterministic
+	paths := zw.Paths()
+	if !reflect.DeepEqual(paths, createPaths) {
+		t.Errorf("paths=%#v != createPaths=%#v", paths, createPaths)
+	}
+
+	for _, path := range createPaths {
+		if !zw.Contains(path) {
+			t.Error("should contain path: ", path)
+		}
 	}
 }
