@@ -10,6 +10,20 @@ pyz_binary(
     visibility=["//visibility:public"],
 )
 
+pyz_binary(
+    name="wheeltool",
+    srcs=["wheeltool.py"],
+    wheels=["@pyz_setuptools_whl//file"],
+    visibility=["//visibility:public"],
+)
+# checks imports: needs pkg_resources which is not in the standard library
+sh_test(
+    name="wheeltool_test",
+    srcs=["wheeltool_test.sh"],
+    data=[":wheeltool"],
+    args=["$(location :wheeltool)"],
+)
+
 pyz_library(
     name="pip_lib",
     # pip bundles these certs and cannot read them from the zip
@@ -26,10 +40,17 @@ py_binary(
     srcs=["pip_generate_wrapper.py"],
     data=[
         ":pip",
-        ":wheeltool.py",
+        ":wheeltool",
 
         "//tools:pip_generate",
     ]
+)
+# checks tool path
+sh_test(
+    name="pip_generate_wrapper_test",
+    srcs=["pip_generate_wrapper_test.sh"],
+    data=[":pip_generate_wrapper"],
+    args=["$(location :pip_generate_wrapper)"],
 )
 
 pyz_test(
