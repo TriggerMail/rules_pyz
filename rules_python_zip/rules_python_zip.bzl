@@ -261,8 +261,8 @@ def pyz_repositories():
     excludes = native.existing_rules().keys()
     native.http_file(
         name = 'pyz_pytest_whl',
-        url = 'https://pypi.python.org/packages/38/af/8dcf688d192914928393f931b7b550f2530299bbb08018b2f17efa6aab73/pytest-3.3.2-py2.py3-none-any.whl',
-        sha256 = 'b84878865558194630c6147f44bdaef27222a9f153bbd4a08908b16bf285e0b1'
+        url = 'https://pypi.python.org/packages/41/e4/9de71dc666485c921f5c8d2d8078109af1f3925bf52f17ccf4c7cc19a8a0/pytest-3.4.0-py2.py3-none-any.whl',
+        sha256 = '95fa025cd6deb5d937e04e368a00552332b58cae23f63b76c8c540ff1733ab6d'
     )
     native.http_file(
         name = 'pyz_six_whl',
@@ -291,6 +291,6 @@ def pyz_repositories():
     )
     native.http_file(
         name = 'pyz_setuptools_whl',
-        url = 'https://pypi.python.org/packages/75/d1/5abca4ccf61a7ab86c255dd315fb96e566fbf9b5d3a480e72c93e8ec2802/setuptools-38.4.0-py2.py3-none-any.whl',
-        sha256 = '155c2ec9fdcc00c3973d966b416e1cf3a1e7ce75f4c09fb760b23f94b935926e'
+        url = 'https://pypi.python.org/packages/43/41/033a273f9a25cb63050a390ee8397acbc7eae2159195d85f06f17e7be45a/setuptools-38.5.1-py2.py3-none-any.whl',
+        sha256 = '7ffe771abfae419fd104f93400b61c935b5af10bfe4dfeec7a1bd495694eea35'
     )
