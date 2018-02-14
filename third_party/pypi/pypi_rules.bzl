@@ -609,7 +609,7 @@ def pypi_libraries():
     )
     pyz_library(
         name="setuptools",
-        wheels=["@pyz_setuptools_whl//file"],
+        wheels=["@pypi_setuptools_whl//file"],
         deps=[
         ],
         licenses=["notice"],

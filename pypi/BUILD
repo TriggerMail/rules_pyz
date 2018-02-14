@@ -13,7 +13,7 @@ pyz_binary(
 pyz_binary(
     name="wheeltool",
     srcs=["wheeltool.py"],
-    wheels=["@pyz_setuptools_whl//file"],
+    deps=["//rules_python_zip:setuptools"],
     visibility=["//visibility:public"],
 )
 # checks imports: needs pkg_resources which is not in the standard library
@@ -32,7 +32,8 @@ pyz_library(
     #     "pip/_vendor/requests/cacerts.pem",
     #     "pip/_vendor/requests/certs.py",
     # ],
-    wheels=["@pyz_pip_whl//file", "@pyz_wheel_whl//file", "@pyz_setuptools_whl//file"],
+    deps=["//rules_python_zip:setuptools"],
+    wheels=["@pypi_pip_whl//file", "@pypi_wheel_whl//file"],
 )
 
 py_binary(

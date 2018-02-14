@@ -145,6 +145,18 @@ def _pyz_binary_impl(ctx):
 
     provider = _get_transitive_provider(ctx)
 
+    # we must include setuptools in all pyz_binary: it includes pkg_resources which is needed
+    # to load resources from zip files
+    if not ctx.attr.force_all_unzip:
+        has_setuptools = any(['/setuptools-' in f.path for f in provider.transitive_wheels])
+        if not has_setuptools:
+            provider = _PyZProvider(
+                transitive_src_mappings=provider.transitive_src_mappings,
+                transitive_srcs=provider.transitive_srcs,
+                transitive_wheels=provider.transitive_wheels + [ctx.file._setuptools_whl],
+                transitive_force_unzip=provider.transitive_force_unzip,
+            )
+
     manifest = struct(
         sources=provider.transitive_src_mappings.to_list(),
         wheels=[f.path for f in provider.transitive_wheels],
@@ -185,6 +197,10 @@ pyz_binary = rule(
 
         # Forces the contents of the pyz_binary to be extracted and run from a temp dir.
         "force_all_unzip": attr.bool(default=False),
+
+        "_setuptools_whl": attr.label(
+            allow_single_file=True,
+            default=Label("@pypi_setuptools_whl//file")),
     },
     executable = True,
 )
@@ -267,38 +283,45 @@ def pyz_repositories():
     """Rules to be invoked from WORKSPACE to load remote dependencies."""
 
     excludes = native.existing_rules().keys()
-    native.http_file(
-        name = 'pyz_pytest_whl',
-        url = 'https://pypi.python.org/packages/41/e4/9de71dc666485c921f5c8d2d8078109af1f3925bf52f17ccf4c7cc19a8a0/pytest-3.4.0-py2.py3-none-any.whl',
-        sha256 = '95fa025cd6deb5d937e04e368a00552332b58cae23f63b76c8c540ff1733ab6d'
-    )
-    native.http_file(
-        name = 'pyz_six_whl',
-        url = 'https://pypi.python.org/packages/67/4b/141a581104b1f6397bfa78ac9d43d8ad29a7ca43ea90a2d863fe3056e86a/six-1.11.0-py2.py3-none-any.whl',
-        sha256 = '832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb'
-    )
-    native.http_file(
-        name = 'pyz_py_whl',
-        url = 'https://pypi.python.org/packages/41/70/adacedf6cdc13700d40303f78b241f98c959e2745fdebbe56af74c08344d/py-1.5.2-py2.py3-none-any.whl',
-        sha256 = '8cca5c229d225f8c1e3085be4fcf306090b00850fefad892f9d96c7b6e2f310f'
-    )
-    native.http_file(
-        name = 'pyz_funcsigs_whl',
-        url = 'https://pypi.python.org/packages/69/cb/f5be453359271714c01b9bd06126eaf2e368f1fddfff30818754b5ac2328/funcsigs-1.0.2-py2.py3-none-any.whl',
-        sha256 = '330cc27ccbf7f1e992e69fef78261dc7c6569012cf397db8d3de0234e6c937ca'
-    )
-    native.http_file(
-        name = 'pyz_pluggy_tgz',
-        url = 'https://pypi.python.org/packages/11/bf/cbeb8cdfaffa9f2ea154a30ae31a9d04a1209312e2919138b4171a1f8199/pluggy-0.6.0.tar.gz',
-        sha256 = '7f8ae7f5bdf75671a718d2daf0a64b7885f74510bcd98b1a0bb420eb9a9d0cff',
-    )
-    native.http_file(
-        name = 'pyz_attrs_whl',
-        url = 'https://pypi.python.org/packages/b5/60/4e178c1e790fd60f1229a9b3cb2f8bc2f4cc6ff2c8838054c142c70b5adc/attrs-17.4.0-py2.py3-none-any.whl',
-        sha256 = 'a17a9573a6f475c99b551c0e0a812707ddda1ec9653bed04c13841404ed6f450'
-    )
-    native.http_file(
-        name = 'pyz_setuptools_whl',
-        url = 'https://pypi.python.org/packages/43/41/033a273f9a25cb63050a390ee8397acbc7eae2159195d85f06f17e7be45a/setuptools-38.5.1-py2.py3-none-any.whl',
-        sha256 = '7ffe771abfae419fd104f93400b61c935b5af10bfe4dfeec7a1bd495694eea35'
-    )
+    if 'pypi_pytest_whl' not in excludes:
+        native.http_file(
+            name = 'pypi_pytest_whl',
+            url = 'https://pypi.python.org/packages/41/e4/9de71dc666485c921f5c8d2d8078109af1f3925bf52f17ccf4c7cc19a8a0/pytest-3.4.0-py2.py3-none-any.whl',
+            sha256 = '95fa025cd6deb5d937e04e368a00552332b58cae23f63b76c8c540ff1733ab6d'
+        )
+    if 'pypi_six_whl' not in excludes:
+        native.http_file(
+            name = 'pypi_six_whl',
+            url = 'https://pypi.python.org/packages/67/4b/141a581104b1f6397bfa78ac9d43d8ad29a7ca43ea90a2d863fe3056e86a/six-1.11.0-py2.py3-none-any.whl',
+            sha256 = '832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb'
+        )
+    if 'pypi_py_whl' not in excludes:
+        native.http_file(
+            name = 'pypi_py_whl',
+            url = 'https://pypi.python.org/packages/41/70/adacedf6cdc13700d40303f78b241f98c959e2745fdebbe56af74c08344d/py-1.5.2-py2.py3-none-any.whl',
+            sha256 = '8cca5c229d225f8c1e3085be4fcf306090b00850fefad892f9d96c7b6e2f310f'
+        )
+    if 'pypi_funcsigs_whl' not in excludes:
+        native.http_file(
+            name = 'pypi_funcsigs_whl',
+            url = 'https://pypi.python.org/packages/69/cb/f5be453359271714c01b9bd06126eaf2e368f1fddfff30818754b5ac2328/funcsigs-1.0.2-py2.py3-none-any.whl',
+            sha256 = '330cc27ccbf7f1e992e69fef78261dc7c6569012cf397db8d3de0234e6c937ca'
+        )
+    if 'pypi_pluggy_tgz' not in excludes:
+        native.http_file(
+            name = 'pypi_pluggy_tgz',
+            url = 'https://pypi.python.org/packages/11/bf/cbeb8cdfaffa9f2ea154a30ae31a9d04a1209312e2919138b4171a1f8199/pluggy-0.6.0.tar.gz',
+            sha256 = '7f8ae7f5bdf75671a718d2daf0a64b7885f74510bcd98b1a0bb420eb9a9d0cff',
+        )
+    if 'pypi_attrs_whl' not in excludes:
+        native.http_file(
+            name = 'pypi_attrs_whl',
+            url = 'https://pypi.python.org/packages/b5/60/4e178c1e790fd60f1229a9b3cb2f8bc2f4cc6ff2c8838054c142c70b5adc/attrs-17.4.0-py2.py3-none-any.whl',
+            sha256 = 'a17a9573a6f475c99b551c0e0a812707ddda1ec9653bed04c13841404ed6f450'
+        )
+    if 'pypi_setuptools_whl' not in excludes:
+        native.http_file(
+            name = 'pypi_setuptools_whl',
+            url = 'https://pypi.python.org/packages/43/41/033a273f9a25cb63050a390ee8397acbc7eae2159195d85f06f17e7be45a/setuptools-38.5.1-py2.py3-none-any.whl',
+            sha256 = '7ffe771abfae419fd104f93400b61c935b5af10bfe4dfeec7a1bd495694eea35'
+        )

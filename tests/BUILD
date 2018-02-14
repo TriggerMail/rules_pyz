@@ -109,7 +109,7 @@ pyz_test(
 pyz_test(
     name="import_wheel_test",
     srcs=["import_wheel_test.py"],
-    wheels=["@pyz_py_whl//file"],
+    wheels=["@pypi_py_whl//file"],
 )
 
 pyz_binary(
@@ -282,4 +282,16 @@ pyz_test(
     name="certifi_path_test",
     srcs=["certifi_path_test.py"],
     deps=["//third_party/pypi:certifi"],
+)
+
+pyz_binary(
+    name="pytz_example",
+    srcs=["pytz_example.py"],
+    deps=["//third_party/pypi:pytz"],
+)
+sh_test(
+    name="pytz_example_test",
+    srcs=["command_output_tester.py"],
+    data=[":pytz_example"],
+    args=["--command=$(location :pytz_example)", "--expected-output='SUCCESS'"],
 )
