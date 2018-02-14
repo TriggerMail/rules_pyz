@@ -84,6 +84,10 @@ sh_test(
 pyz_test(
     name="trivial_test",
     srcs=["trivial_test.py"],
+    size="small",
+    timeout="short",
+    flaky=False,
+    local=0,
 )
 sh_test(
     name="pytest_output_test",

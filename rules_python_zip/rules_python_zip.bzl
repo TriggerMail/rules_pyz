@@ -229,7 +229,8 @@ _pyz_script_test = rule(
 )
 
 
-def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False, licenses=[]):
+def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False,
+    flaky=None, licenses=[], local=None, timeout=None, shard_count=None, size=None):
     '''Macro that outputs a pyz_binary with all the test code and executes it with a shell script
     to pass the correct arguments.'''
 
@@ -241,8 +242,8 @@ def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False, 
         deps = deps + [str(pytest_label)],
         wheels = wheels,
         entry_point = "pytest",
-        testonly = True,
         force_all_unzip = force_all_unzip,
+        testonly = True,
         licenses = licenses,
     )
 
@@ -251,7 +252,14 @@ def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False, 
         srcs = srcs,
         data = data,
         compiled_deps = compiled_deps_name,
+        testonly = True,
         licenses = licenses,
+
+        flaky = flaky,
+        local = local,
+        shard_count = shard_count,
+        size = size,
+        timeout = timeout,
     )
 
 
