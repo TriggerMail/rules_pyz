@@ -279,7 +279,8 @@ func main() {
 	// sort to make output deterministic: avoids unneeded rebuilds if output is exactly the same
 	sort.Strings(createInitPyPaths)
 	for _, initPyPath := range createInitPyPaths {
-		fmt.Printf("warning: creating %s\n", initPyPath)
+		// TODO: Add a verbose log flag? This could be useful for debugging problems
+		// fmt.Printf("warning: creating %s\n", initPyPath)
 		_, err := zipWriter.CreateWithMethod(initPyPath, zipMethod)
 		if err != nil {
 			panic(err)
