@@ -208,13 +208,18 @@ pyz_binary = rule(
 
 def _pyz_script_test_impl(ctx):
     # run the pyz_binary with all our dependencies, with the srcs on the command line
-    test_file_paths = [f.short_path for f in ctx.files.srcs]
+    test_file_paths = []
+    for f in ctx.files.srcs:
+        # TODO: what is the right workspace path?
+        # TODO: Bash escape
+        runfiles_path = "${RUNFILES}/__main__/" + f.short_path
+        test_file_paths.append(runfiles_path)
+
     ctx.actions.expand_template(
         template = ctx.file._pytest_template,
         output = ctx.outputs.executable,
         substitutions = {
             "{{PYTEST_RUNNER}}": ctx.file.compiled_deps.short_path,
-            # TODO: Bash escape
             "{{SRCS_LIST}}": " ".join(test_file_paths),
         },
     )

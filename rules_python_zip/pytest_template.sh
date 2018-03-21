@@ -4,7 +4,6 @@ set -euf -o pipefail
 
 
 RUNFILES="${TEST_SRCDIR:-${BASH_SOURCE[0]}.runfiles}"
-# export TEST_TMPDIR="${TEST_TMPDIR:-$(mktemp -d)}"
 
 # pytest rewrites bytecode into __pycache__: no point with Bazel's sandbox
 export PYTHONDONTWRITEBYTECODE=1

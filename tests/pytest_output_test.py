@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -42,6 +43,20 @@ def main():
     pycache_path = os.path.join(os.path.dirname(__file__), '__pycache__')
     if os.path.exists(pycache_path):
         raise Exception('pytest __pycache__ directory was created: should not be!')
+
+    absolute_test_path = os.path.abspath(test_path)
+
+    # verify the test works when executed from some other directory
+    tempdir = tempfile.mkdtemp()
+    try:
+        os.chdir(tempdir)
+        del os.environ['SHOULD_FAIL']
+        output = subprocess.check_output(absolute_test_path)
+
+        if '2 passed in' not in output:
+            raise Exception(output)
+    finally:
+        shutil.rmtree(tempdir)
 
 
 if __name__ == '__main__':
