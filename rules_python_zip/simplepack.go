@@ -44,14 +44,6 @@ type packageInfo struct {
 	ForceAllUnzip bool     `json:"force_all_unzip"`
 }
 
-func zipCreateWithMethod(z *zip.Writer, name string) (io.Writer, error) {
-	header := zip.FileHeader{
-		Name:   name,
-		Method: zipMethod,
-	}
-	return z.CreateHeader(&header)
-}
-
 func isPyFile(path string) bool {
 	return strings.HasSuffix(path, ".py") || strings.HasSuffix(path, ".pyc") || strings.HasSuffix(path, ".pyo")
 }
@@ -102,11 +94,21 @@ func newCachedPathsZipWriter(w io.Writer) *cachedPathsZipWriter {
 func (c *cachedPathsZipWriter) Close() error {
 	return c.writer.Close()
 }
-func (c *cachedPathsZipWriter) CreateWithMethod(name string, method uint16) (io.Writer, error) {
-	header := &zip.FileHeader{
-		Name:   name,
-		Method: method,
+func (c *cachedPathsZipWriter) CreateWithMethod(
+	fileinfo os.FileInfo, name string, method uint16,
+) (io.Writer, error) {
+	var header *zip.FileHeader
+	var err error
+	if fileinfo != nil {
+		header, err = zip.FileInfoHeader(fileinfo)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		header = &zip.FileHeader{}
 	}
+	header.Name = name
+	header.Method = method
 	out, err := c.writer.CreateHeader(header)
 	if err != nil {
 		return nil, err
@@ -195,7 +197,11 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		writer, err := zipWriter.CreateWithMethod(sourceMeta.Dst, zipMethod)
+		stat, err := os.Stat(sourceMeta.Src)
+		if err != nil {
+			panic(err)
+		}
+		writer, err := zipWriter.CreateWithMethod(stat, sourceMeta.Dst, zipMethod)
 		if err != nil {
 			panic(err)
 		}
@@ -209,7 +215,7 @@ func main() {
 		}
 	}
 
-	writer, err := zipWriter.CreateWithMethod("__main__.py", zipMethod)
+	writer, err := zipWriter.CreateWithMethod(nil, "__main__.py", zipMethod)
 	if err != nil {
 		panic(err)
 	}
@@ -236,7 +242,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			copyF, err := zipWriter.CreateWithMethod(wheelF.Name, zipMethod)
+			copyF, err := zipWriter.CreateWithMethod(wheelF.FileInfo(), wheelF.Name, zipMethod)
 			if err != nil {
 				panic(err)
 			}
@@ -281,7 +287,7 @@ func main() {
 	for _, initPyPath := range createInitPyPaths {
 		// TODO: Add a verbose log flag? This could be useful for debugging problems
 		// fmt.Printf("warning: creating %s\n", initPyPath)
-		_, err := zipWriter.CreateWithMethod(initPyPath, zipMethod)
+		_, err := zipWriter.CreateWithMethod(nil, initPyPath, zipMethod)
 		if err != nil {
 			panic(err)
 		}
@@ -321,7 +327,7 @@ func main() {
 
 	// write the zip package metadata for the __main__ script to use
 	zipPackageMetadata := &packageInfo{unzipPaths, zipManifest.ForceAllUnzip}
-	writer, err = zipWriter.CreateWithMethod(zipInfoPath, zipMethod)
+	writer, err = zipWriter.CreateWithMethod(nil, zipInfoPath, zipMethod)
 	if err != nil {
 		panic(err)
 	}
@@ -361,7 +367,6 @@ for path in sys.path:
     # Python on Mac OS X ships with wacky stuff in Extras, like an out of date version of six
     # We don't want our zips to find those files: they should bundle anything they need
     if is_site_packages_path(path):
-        #print 'removing path entry:', path
         continue
     else:
         new_paths.append(path)
@@ -449,6 +454,18 @@ if need_unzip and isinstance(__loader__, zipimport.zipimporter):
     import types
     import zipfile
 
+    # Extracts zips and preserves original permissions from Unix systems
+    # https://bugs.python.org/issue15795
+    # https://stackoverflow.com/questions/39296101/python-zipfile-removes-execute-permissions-from-binaries
+    class PreservePermissionsZipFile(zipfile.ZipFile):
+        def extract(self, member, path=None, pwd=None):
+            extracted_path = super(PreservePermissionsZipFile, self).extract(member, path, pwd)
+            info = self.getinfo(member)
+            original_attr = info.external_attr >> 16
+            if original_attr != 0:
+                os.chmod(extracted_path, original_attr)
+            return extracted_path
+
     # create the dir and clean it up atexit:
     # can't use a finally handler: it gets invoked BEFORE tracebacks are printed
     tempdir = tempfile.mkdtemp('_pyzip')
@@ -456,7 +473,7 @@ if need_unzip and isinstance(__loader__, zipimport.zipimporter):
     atexit.register(clean_tempdir_parent_only, tempdir)
     sys.path.insert(0, tempdir)
 
-    package_zip = zipfile.ZipFile(__loader__.archive)
+    package_zip = PreservePermissionsZipFile(__loader__.archive)
     files_to_unzip = package_info['unzip_paths']
     if package_info['force_all_unzip']:
         files_to_unzip = None

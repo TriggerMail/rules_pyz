@@ -295,3 +295,16 @@ sh_test(
     data=[":pytz_example"],
     args=["--command=$(location :pytz_example)", "--expected-output='SUCCESS'"],
 )
+
+pyz_binary(
+    name="executable_data",
+    srcs=["executable_data.py"],
+    data=["executable.sh"],
+    zip_safe=False,
+)
+sh_test(
+    name="executable_data_test",
+    srcs=["command_output_tester.py"],
+    data=[":executable_data"],
+    args=["--command=$(location :executable_data)", "--expected-output='hello from executable.sh'"],
+)

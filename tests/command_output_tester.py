@@ -1,11 +1,25 @@
 #!/usr/bin/env python2.7
-
 import argparse
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
 import zipfile
+
+
+# Extracts zips and preserves original permissions from Unix systems
+# TODO: This is copied from simplepack.go; include it somehow?
+# https://bugs.python.org/issue15795
+# https://stackoverflow.com/questions/39296101/python-zipfile-removes-execute-permissions-from-binaries
+class PreservePermissionsZipFile(zipfile.ZipFile):
+    def extract(self, member, path=None, pwd=None):
+        extracted_path = super(PreservePermissionsZipFile, self).extract(member, path, pwd)
+        info = self.getinfo(member)
+        original_attr = info.external_attr >> 16
+        if original_attr != 0:
+            os.chmod(extracted_path, original_attr)
+        return extracted_path
 
 
 def run_and_check(args, expected_output, expect_success):
@@ -48,7 +62,7 @@ def main():
         print 'testing from unpacked zip ...'
         tempdir = tempfile.mkdtemp()
         try:
-            zf = zipfile.ZipFile(command_path)
+            zf = PreservePermissionsZipFile(command_path)
             zf.extractall(tempdir)
             zf.close()
 
