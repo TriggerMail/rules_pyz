@@ -33,7 +33,7 @@ pyz_library(
     #     "pip/_vendor/requests/certs.py",
     # ],
     deps=["//rules_python_zip:setuptools"],
-    wheels=["@pypi_pip_whl//file", "@pypi_wheel_whl//file"],
+    wheels=["@pypi_pip//file", "@pypi_wheel//file"],
 )
 
 py_binary(

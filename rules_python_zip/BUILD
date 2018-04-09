@@ -18,11 +18,12 @@ pyz_library(
     name="pytest",
     wheels=[
         ":pluggy_whl"   ,
-        "@pypi_attrs_whl//file",
-        "@pypi_funcsigs_whl//file",
-        "@pypi_py_whl//file",
-        "@pypi_pytest_whl//file",
-        "@pypi_six_whl//file",
+        "@pypi_attrs//file",
+        "@pypi_funcsigs//file",
+        "@pypi_more_itertools//file",
+        "@pypi_py//file",
+        "@pypi_pytest//file",
+        "@pypi_six//file",
     ],
     deps=[":setuptools"],
     visibility=["//visibility:public"],
@@ -30,7 +31,7 @@ pyz_library(
 
 pyz_library(
     name="setuptools",
-    wheels=["@pypi_setuptools_whl//file"],
+    wheels=["@pypi_setuptools//file"],
     visibility=["//visibility:public"],
 )
 

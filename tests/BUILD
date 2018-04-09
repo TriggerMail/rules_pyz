@@ -109,7 +109,7 @@ pyz_test(
 pyz_test(
     name="import_wheel_test",
     srcs=["import_wheel_test.py"],
-    wheels=["@pypi_py_whl//file"],
+    wheels=["@pypi_py//file"],
 )
 
 pyz_binary(

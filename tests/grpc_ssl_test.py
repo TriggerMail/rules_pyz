@@ -1,5 +1,5 @@
-from google.cloud.proto.datastore.v1 import datastore_pb2
-from google.cloud.proto.datastore.v1 import datastore_pb2_grpc
+from google.cloud.datastore_v1.proto import datastore_pb2
+from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 import grpc
 import unittest
 

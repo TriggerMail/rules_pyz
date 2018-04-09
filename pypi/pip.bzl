@@ -2,15 +2,15 @@ def pip_repositories():
     """WORKSPACE rules for generating PyPI dependencies."""
 
     existing = native.existing_rules().keys()
-    if 'pypi_pip_whl' not in existing:
+    if 'pypi_pip' not in existing:
         native.http_file(
-            name = 'pypi_pip_whl',
-            url = 'https://pypi.python.org/packages/b6/ac/7015eb97dc749283ffdec1c3a88ddb8ae03b8fad0f0e611408f196358da3/pip-9.0.1-py2.py3-none-any.whl',
-            sha256 = '690b762c0a8460c303c089d5d0be034fb15a5ea2b75bdf565f40421f542fefb0'
+            name = 'pypi_pip',
+            url = 'https://pypi.python.org/packages/ac/95/a05b56bb975efa78d3557efa36acaf9cf5d2fd0ee0062060493687432e03/pip-9.0.3-py2.py3-none-any.whl',
+            sha256 = 'c3ede34530e0e0b2381e7363aded78e0c33291654937e7373032fda04e8803e5'
         )
-    if 'pypi_wheel_whl' not in existing:
+    if 'pypi_wheel' not in existing:
         native.http_file(
-            name = 'pypi_wheel_whl',
-            url = 'https://pypi.python.org/packages/0c/80/16a85b47702a1f47a63c104c91abdd0a6704ee8ae3b4ce4afc49bc39f9d9/wheel-0.30.0-py2.py3-none-any.whl',
-            sha256 = 'e721e53864f084f956f40f96124a74da0631ac13fbbd1ba99e8e2b5e9cafdf64'
+            name = 'pypi_wheel',
+            url = 'https://pypi.python.org/packages/1b/d2/22cde5ea9af055f81814f9f2545f5ed8a053eb749c08d186b369959189a8/wheel-0.31.0-py2.py3-none-any.whl',
+            sha256 = '9cdc8ab2cc9c3c2e2727a4b67c22881dbb0e1c503d592992594c5e131c867107'
         )
