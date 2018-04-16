@@ -371,6 +371,9 @@ if 'site' in sys.modules:
     command_line = [sys.executable, '-Ss'] + sys.argv
     os.execve(command_line[0], command_line, clean_env)
 
+# Remove PYTHONPATH if set: we want full control over our environment
+os.environ.pop('PYTHONPATH', None)
+
 import errno
 import json
 import zipimport
