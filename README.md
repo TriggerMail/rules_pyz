@@ -51,8 +51,6 @@ If you want to import packages from PyPI, write a pip `requirements.txt` file, t
     ```python
     load("@com_bluecore_rules_pyz//pypi:pip.bzl", "pip_repositories")
     pip_repositories()
-    load("//third_party/pypi:pypi_rules.bzl", "pypi_repositories")
-    pypi_repositories()
     ```
 5. Generate the dependencies using the tool:
     ```bash
@@ -63,8 +61,13 @@ If you want to import packages from PyPI, write a pip `requirements.txt` file, t
         -wheelURLPrefix http://example.com/ \
         -wheelDir wheels
     ```
-6. If this depends on any Python packages that don't publish wheels, you will need to copy the `wheels` directory to some server where they are publicly accessible, and set the `-wheelURLPrefix` argument to that URL. We use a [Google Cloud Storage bucket](https://cloud.google.com/storage/docs/access-public-data) and copy the wheels with: `gsutil -m rsync -a public-read wheels gs://public-bucket` 
-
+6. If this depends on any Python packages that don't publish wheels, you will need to copy the `wheels` directory to some server where they are publicly accessible, and set the `-wheelURLPrefix` argument to that URL. We use a [Google Cloud Storage bucket](https://cloud.google.com/storage/docs/
+access-public-data) and copy the wheels with: `gsutil -m rsync -a public-read wheels gs://public-bucket`
+7. Add the following lines to `WORKSPACE` to load the generae requirements:
+    ```python
+    load("//third_party/pypi:pypi_rules.bzl", "pypi_repositories")
+    pypi_repositories()
+    ```
 
 ## Motivation and problems with existing rules
 
