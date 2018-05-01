@@ -1,0 +1,8 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10.1-stretch
+    steps:
+      - checkout
+      - run: ./circleci.sh
