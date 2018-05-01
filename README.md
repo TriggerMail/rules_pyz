@@ -1,6 +1,6 @@
 # Bazel Python Zip Rules
 
-This package is an alternative to Bazel's built-in Python rules. These rules work with existing Python packages from PyPI. Ideally either the built-in rules or [`rules_python`](https://github.com/bazelbuild/rules_python) should replace them, once they work with external packages.
+This package is an alternative to Bazel's built-in Python rules. These rules work with existing Python packages from PyPI. Ideally either the built-in rules or [`rules_python`](https://github.com/bazelbuild/rules_python) should replace them, once they work with external packages. These rules do work, but they are a bit hacky.
 
 See the [example project](https://github.com/TriggerMail/rules_pyz_example) for a tiny demonstration.
 
@@ -13,7 +13,7 @@ Add the following lines to your `WORKSPACE`:
 # Load the dependencies required for the rules
 git_repository(
     name = "com_bluecore_rules_pyz",
-    commit = "ed9b59ab2979dc87bcd84fbc94ad520b6eaac4dd",
+    commit = "7f095eec62f5220e26e46d55f32082e330f2a988",
     remote = "https://github.com/TriggerMail/rules_pyz.git",
 )
 
@@ -33,7 +33,7 @@ load(
 )
 ```
 
-Instead of `py_*` rules, use `pyz_*`. They should work more or less the same way. One notable difference is instead of `imports` to change the import path, you need to use the `pythonroot` attribute.
+Instead of `py_*` rules, use `pyz_*`. They should work the same way. One notable difference is instead of `imports` to change the import path, you need to use the `pythonroot` attribute, which only applies to the `srcs` and `data` of that rule, and not all transitive dependencies.
 
 
 ### PyPI dependencies
@@ -41,26 +41,29 @@ Instead of `py_*` rules, use `pyz_*`. They should work more or less the same way
 If you want to import packages from PyPI, write a pip `requirements.txt` file, then:
 
 1. `mkdir -p third_party/pypi`
-2. Add the following lines to `third_party/pypi/BUILD`:
+2. `mkdir wheels`
+3. Add the following lines to `third_party/pypi/BUILD`:
     ```python
     load(":pypi_rules.bzl", "pypi_libraries")
     pypi_libraries()
     ```
-3. Add the following lines to `WORKSPACE`:
+4. Add the following lines to `WORKSPACE`:
     ```python
     load("@com_bluecore_rules_pyz//pypi:pip.bzl", "pip_repositories")
     pip_repositories()
     load("//third_party/pypi:pypi_rules.bzl", "pypi_repositories")
     pypi_repositories()
     ```
-4. Generate the dependencies using the tool:
+5. Generate the dependencies using the tool:
     ```bash
     bazel build @com_bluecore_rules_pyz//pypi:pip_generate_wrapper
     bazel-bin/external/com_bluecore_rules_pyz/pypi/pip_generate_wrapper \
         -requirements requirements.txt \
         -output third_party/pypi/pypi_rules.bzl \
-        -wheelURLPrefix http://example.com/
+        -wheelURLPrefix http://example.com/ \
+        -wheelDir wheels
     ```
+6. If this depends on any Python packages that don't publish wheels, you will need to copy the `wheels` directory to some server where they are publicly accessible, and set the `-wheelURLPrefix` argument to that URL. We use a [Google Cloud Storage bucket](https://cloud.google.com/storage/docs/access-public-data) and copy the wheels with: `gsutil -m rsync -a public-read wheels gs://public-bucket` 
 
 
 ## Motivation and problems with existing rules
