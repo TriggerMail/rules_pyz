@@ -468,12 +468,12 @@ def _get_package_path(path):
 
 def _get_package_data(path):
     path = _get_package_path(path)
-    return __loader__.get_data(path).decode()
+    return __loader__.get_data(path)
 
 
 def _read_package_info():
     info_bytes = _get_package_data('` + zipInfoPath + `')
-    return json.loads(info_bytes)
+    return json.loads(info_bytes.decode('utf-8'))
 
 
 __NAMESPACE_LINE = "__path__ = __import__('__namespace_hack__').extend_path_zip(__path__, __name__)\n"
@@ -484,7 +484,7 @@ def _copy_as_namespace(tempdir, unzipped_dir):
     output_path = os.path.join(tempdir, init_path)
     with open(os.path.join(tempdir, unzipped_dir, '__init__.py'), 'w') as f:
         try:
-            data = __loader__.get_data(init_path).decode()
+            data = __loader__.get_data(init_path).decode('utf-8')
             # from future imports must be the first statement in __init__.py: insert our line after
             # this must be after any comments and doc comments
             # TODO: maybe we should do this at "build" time?
