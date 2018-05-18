@@ -501,7 +501,7 @@ def _copy_as_namespace(tempdir, unzipped_dir):
                 if len(lines) > 1 and lines[1].startswith('#'):
                     last_future_line = 1
             lines.insert(last_future_line+1, __NAMESPACE_LINE)
-            f.write('\n'.join(lines))
+            f.write('\n'.join(lines).encode('utf-8'))
         except IOError:
             # ziploader.get_data raises this if the file does not exist
             f.write(__NAMESPACE_LINE)
