@@ -473,7 +473,7 @@ def _get_package_data(path):
 
 def _read_package_info():
     info_bytes = _get_package_data('` + zipInfoPath + `')
-    return json.loads(info_bytes)
+    return json.loads(info_bytes.decode('utf-8'))
 
 
 __NAMESPACE_LINE = "__path__ = __import__('__namespace_hack__').extend_path_zip(__path__, __name__)\n"
@@ -484,7 +484,7 @@ def _copy_as_namespace(tempdir, unzipped_dir):
     output_path = os.path.join(tempdir, init_path)
     with open(os.path.join(tempdir, unzipped_dir, '__init__.py'), 'w') as f:
         try:
-            data = __loader__.get_data(init_path)
+            data = __loader__.get_data(init_path).decode('utf-8')
             # from future imports must be the first statement in __init__.py: insert our line after
             # this must be after any comments and doc comments
             # TODO: maybe we should do this at "build" time?
@@ -501,7 +501,7 @@ def _copy_as_namespace(tempdir, unzipped_dir):
                 if len(lines) > 1 and lines[1].startswith('#'):
                     last_future_line = 1
             lines.insert(last_future_line+1, __NAMESPACE_LINE)
-            f.write('\n'.join(lines))
+            f.write('\n'.join(lines).encode('utf-8'))
         except IOError:
             # ziploader.get_data raises this if the file does not exist
             f.write(__NAMESPACE_LINE)
@@ -642,7 +642,7 @@ clean_globals['__file__'] = script_path
 ast = compile(script_data, script_path, 'exec', flags=0, dont_inherit=1)
 
 # execute the script with a clean state (no imports or variables)
-exec ast in clean_globals
+exec(ast, clean_globals)
 {{else}}
 runpy.run_module('{{.EntryPoint}}', run_name='__main__')
 {{end}}

@@ -1,9 +1,13 @@
 py_file_types = FileType([".py"])
+
 wheel_file_types = FileType([".whl"])
 
-
-_PyZProvider = provider(fields=[
-    "transitive_src_mappings", "transitive_srcs", "transitive_wheels", "transitive_force_unzip"])
+PyZProvider = provider(fields = [
+    "transitive_src_mappings",
+    "transitive_srcs",
+    "transitive_wheels",
+    "transitive_force_unzip",
+])
 
 _pyz_attrs = {
     "srcs": attr.label_list(
@@ -12,29 +16,32 @@ _pyz_attrs = {
     ),
     "deps": attr.label_list(
         allow_files = False,
-        providers = [_PyZProvider],
+        providers = [PyZProvider],
     ),
     "wheels": attr.label_list(
         flags = ["DIRECT_COMPILE_TIME_INPUT"],
         allow_files = wheel_file_types,
     ),
-    "pythonroot": attr.string(default=""),
+    "pythonroot": attr.string(default = ""),
     "_simplepack": attr.label(
-        executable=True,
-        cfg="host",
-        allow_single_file=True,
-        default=Label("//tools:simplepack")),
-    "data": attr.label_list(allow_files = True, cfg = "data"),
+        executable = True,
+        cfg = "host",
+        allow_single_file = True,
+        default = Label("//tools:simplepack"),
+    ),
+    "data": attr.label_list(
+        allow_files = True,
+        cfg = "data",
+    ),
 
     # this target's direct files must be unzipped to be executed. This is usually
     # because Python code relies on __file__ relative paths existing.
-    "zip_safe": attr.bool(default=True),
+    "zip_safe": attr.bool(default = True),
 
     # required so the rules can be used in third_party without error:
     # third-party rule '//third_party/pypi:example' lacks a license declaration
     "licenses": attr.license(),
 }
-
 
 def get_pythonroot(ctx):
     if ctx.attr.pythonroot == "":
@@ -67,7 +74,6 @@ def get_pythonroot(ctx):
 
     return pythonroot
 
-
 def _get_destination_path(prefix, file):
     destination = file.short_path
     # external repositories have paths like "../repository_name/"
@@ -77,7 +83,6 @@ def _get_destination_path(prefix, file):
     if destination.startswith(prefix):
         destination = destination[len(prefix):]
     return destination
-
 
 def _get_transitive_provider(ctx):
     # build the mapping from source to destinations for this rule
@@ -113,27 +118,25 @@ def _get_transitive_provider(ctx):
         force_unzips += [f.path for f in ctx.files.wheels]
     transitive_force_unzip = depset(direct=force_unzips)
     for dep in ctx.attr.deps:
-        transitive_src_mappings += dep[_PyZProvider].transitive_src_mappings
-        transitive_srcs += dep[_PyZProvider].transitive_srcs
-        transitive_wheels += dep[_PyZProvider].transitive_wheels
-        transitive_force_unzip += dep[_PyZProvider].transitive_force_unzip
+        transitive_src_mappings += dep[PyZProvider].transitive_src_mappings
+        transitive_srcs += dep[PyZProvider].transitive_srcs
+        transitive_wheels += dep[PyZProvider].transitive_wheels
+        transitive_force_unzip += dep[PyZProvider].transitive_force_unzip
 
-    return _PyZProvider(
+    return PyZProvider(
         transitive_src_mappings=transitive_src_mappings,
         transitive_srcs=transitive_srcs,
         transitive_wheels=transitive_wheels,
         transitive_force_unzip=transitive_force_unzip,
     )
 
-
 def _pyz_library_impl(ctx):
     provider = _get_transitive_provider(ctx)
     return [provider]
 
-
 pyz_library = rule(
     _pyz_library_impl,
-    attrs = _pyz_attrs
+    attrs = _pyz_attrs,
 )
 
 def _pyz_binary_impl(ctx):
@@ -150,7 +153,7 @@ def _pyz_binary_impl(ctx):
     if not ctx.attr.force_all_unzip:
         has_setuptools = any(['/setuptools-' in f.path for f in provider.transitive_wheels])
         if not has_setuptools:
-            provider = _PyZProvider(
+            provider = PyZProvider(
                 transitive_src_mappings=provider.transitive_src_mappings,
                 transitive_srcs=provider.transitive_srcs,
                 transitive_wheels=provider.transitive_wheels + [ctx.file._setuptools_whl],
@@ -180,31 +183,29 @@ def _pyz_binary_impl(ctx):
         outputs=[ctx.outputs.executable],
         arguments=[manifest_file.path, ctx.outputs.executable.path],
         executable=ctx.executable._simplepack,
-        mnemonic="PackPython"
+        mnemonic="PackPyZ"
     )
-
 
 pyz_binary = rule(
     _pyz_binary_impl,
     attrs = _pyz_attrs + {
-        "entry_point": attr.string(default=""),
+        "entry_point": attr.string(default = ""),
 
         # If True, act like a Python interpreter: interactive shell or execute scripts
-        "interpreter": attr.bool(default=False),
+        "interpreter": attr.bool(default = False),
 
         # Path to the Python interpreter to write as the #! line on the zip.
-        "interpreter_path": attr.string(default=""),
+        "interpreter_path": attr.string(default = ""),
 
         # Forces the contents of the pyz_binary to be extracted and run from a temp dir.
-        "force_all_unzip": attr.bool(default=False),
-
+        "force_all_unzip": attr.bool(default = False),
         "_setuptools_whl": attr.label(
-            allow_single_file=True,
-            default=Label("@pypi_setuptools//file")),
+            allow_single_file = True,
+            default = Label("@pypi_setuptools//file"),
+        ),
     },
     executable = True,
 )
-
 
 def _pyz_script_test_impl(ctx):
     # run the pyz_binary with all our dependencies, with the srcs on the command line
@@ -232,14 +233,16 @@ def _pyz_script_test_impl(ctx):
         runfiles=runfiles
     )]
 
-
 _pyz_script_test = rule(
     _pyz_script_test_impl,
     attrs = _pyz_attrs + {
-        "compiled_deps": attr.label(mandatory=True, allow_single_file=True),
+        "compiled_deps": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+        ),
         "_pytest_template": attr.label(
-            default="//rules_python_zip:pytest_template.sh",
-            allow_single_file=True,
+            default = "//rules_python_zip:pytest_template.sh",
+            allow_single_file = True,
         ),
 
         # required so the pyz_test can be used in third_party without error
@@ -249,20 +252,24 @@ _pyz_script_test = rule(
     test = True,
 )
 
-
 def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False,
-    flaky=None, licenses=[], local=None, timeout=None, shard_count=None, size=None):
+    flaky=None, licenses=[], local=None, timeout=None, shard_count=None, size=None,
+    interpreter_path=""):
     '''Macro that outputs a pyz_binary with all the test code and executes it with a shell script
     to pass the correct arguments.'''
 
     # Label ensures this is resolved correctly if used as an external workspace
     pytest_label = Label("//rules_python_zip:pytest")
-    compiled_deps_name = "%s_deps" % (name)
+    compiled_deps_name = "%s__deps" % name
     pyz_binary(
         name = compiled_deps_name,
         deps = deps + [str(pytest_label)],
+        data = data,
         wheels = wheels,
         entry_point = "pytest",
+
+        # Path to the Python interpreter to write as the #! line on the zip.
+        interpreter_path=interpreter_path,
         force_all_unzip = force_all_unzip,
         testonly = True,
         licenses = licenses,
@@ -282,7 +289,6 @@ def pyz_test(name, srcs=[], deps=[], wheels=[], data=[], force_all_unzip=False,
         size = size,
         timeout = timeout,
     )
-
 
 def pyz_repositories():
     """Rules to be invoked from WORKSPACE to load remote dependencies."""
