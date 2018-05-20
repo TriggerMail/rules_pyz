@@ -13,7 +13,7 @@ Add the following lines to your `WORKSPACE`:
 # Load the dependencies required for the rules
 git_repository(
     name = "com_bluecore_rules_pyz",
-    commit = "7f095eec62f5220e26e46d55f32082e330f2a988",
+    commit = "eb2527d42664bc2dc4834ee54cb1bb94a1d08216",
     remote = "https://github.com/TriggerMail/rules_pyz.git",
 )
 
@@ -57,17 +57,22 @@ If you want to import packages from PyPI, write a pip `requirements.txt` file, t
     bazel build @com_bluecore_rules_pyz//pypi:pip_generate_wrapper
     bazel-bin/external/com_bluecore_rules_pyz/pypi/pip_generate_wrapper \
         -requirements requirements.txt \
-        -output third_party/pypi/pypi_rules.bzl \
+        -outputDir third_party/pypi \
         -wheelURLPrefix http://example.com/ \
         -wheelDir wheels
     ```
 6. If this depends on any Python packages that don't publish wheels, you will need to copy the `wheels` directory to some server where they are publicly accessible, and set the `-wheelURLPrefix` argument to that URL. We use a [Google Cloud Storage bucket](https://cloud.google.com/storage/docs/
 access-public-data) and copy the wheels with: `gsutil -m rsync -a public-read wheels gs://public-bucket`
-7. Add the following lines to `WORKSPACE` to load the generae requirements:
+7. Add the following lines to `WORKSPACE` to load the generate requirements:
     ```python
     load("//third_party/pypi:pypi_rules.bzl", "pypi_repositories")
     pypi_repositories()
     ```
+
+### Local Wheels
+
+As an alternative to publishing built wheels, you can check them in to your repository. If you omit the `wheelURLPrefix` flag, `pip_generate` will generate references relative to your WORKSPACE.
+
 
 ## Motivation and problems with existing rules
 
