@@ -93,7 +93,7 @@ func (w *wheelInfo) makeBazelRule(name *string, wheelDir *string) string {
 		output += fmt.Sprintf("        licenses=[\"notice\"],\n")
 		output += fmt.Sprintf("    )\n")
 	} else {
-		output += fmt.Sprintf("    if not \"%s\" in native.existing_rules():\n", *name)
+		output += fmt.Sprintf("    if \"%s\" not in existing_rules:\n", *name)
 		output += fmt.Sprintf("        native.http_file(\n")
 		output += fmt.Sprintf("            name=\"%s\",\n", *name)
 		output += fmt.Sprintf("            url=\"%s\",\n", w.url)
@@ -267,10 +267,13 @@ func renameIfNotExists(oldPath string, newPath string) error {
 func main() {
 	requirements := flag.String("requirements", "", "path to requirements.txt")
 	outputDir := flag.String("outputDir", "", "Base directory where generated files will be placed")
-	outputBzlFileName := flag.String("outputBzlFileName", "pypi_rules.bzl", "File name of generated .bzl file (placed in --outputDir)")
-	wheelDir := flag.String("wheelDir", "wheels", "Directory to save wheels, relative to --outputDir")
+	outputBzlFileName := flag.String("outputBzlFileName", "pypi_rules.bzl", "File name of generated .bzl file (placed in -outputDir)")
+	wheelURLPrefix := flag.String("wheelURLPrefix", "",
+		"URL prefix where wheels can be downloaded; if not specified rules will reference wheelDir")
+	wheelDir := flag.String("wheelDir", "wheels",
+		"Directory to save wheels. If wheelURLPrefix is not specified, generated rules will reference this relative to outputDir")
 	preferPyPI := flag.Bool("preferPyPI", true, "download from PyPI if possible")
-	rulesWorkspace := flag.String("rulesWorkspace", "@rules_pyz",
+	rulesWorkspace := flag.String("rulesWorkspace", "@com_bluecore_rules_pyz",
 		"Bazel Workspace path for rules_python_zip")
 	ruleType := flag.String("rulesType", "pyz", "Type of rules to generate: pyz or pex")
 	verbose := flag.Bool("verbose", false, "Log verbose output; log pip output")
@@ -284,6 +287,10 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
+	if *wheelURLPrefix != "" && !strings.HasSuffix(*wheelURLPrefix, "/") {
+		fmt.Fprintln(os.Stderr, "Error: -wheelURLPrefix must end with /")
+		os.Exit(1)
+	}
 	if *ruleType != "pyz" && *ruleType != "pex" {
 		fmt.Fprintln(os.Stderr, "Error: -ruleType must be pyz or pex")
 		os.Exit(1)
@@ -293,16 +300,15 @@ func main() {
 		ruleGenerator = pexLibraryGenerator
 	}
 
-	fullWheelDir := path.Join(*outputDir, *wheelDir)
 	if *wheelDir != "" {
-		stat, err := os.Stat(fullWheelDir)
+		stat, err := os.Stat(*wheelDir)
 		if os.IsNotExist(err) {
-			fmt.Fprintf(os.Stderr, "Error: -wheelDir='%s' does not exist\n", fullWheelDir)
+			fmt.Fprintf(os.Stderr, "Error: -wheelDir='%s' does not exist\n", *wheelDir)
 			os.Exit(1)
 		} else if err != nil {
 			panic(err)
 		} else if !stat.IsDir() {
-			fmt.Fprintf(os.Stderr, "Error: -wheelDir='%s' is not a directory\n", fullWheelDir)
+			fmt.Fprintf(os.Stderr, "Error: -wheelDir='%s' is not a directory\n", *wheelDir)
 			os.Exit(1)
 		}
 	}
@@ -382,7 +388,11 @@ func main() {
 		hasPyPILink := len(link) > 0
 		if !*preferPyPI || !hasPyPILink {
 			hasPyPILink = false
-			link = entry.Name()
+			if *wheelURLPrefix != "" {
+				link = *wheelURLPrefix + entry.Name()
+			} else {
+				link = entry.Name()
+			}
 		}
 
 		wheelPath := path.Join(tempDir, entry.Name())
@@ -390,12 +400,12 @@ func main() {
 			// use the existing wheel in wheelDir if it exists; otherwise update it
 			// avoids unnecessarily updating dependencies due to possible non-reproducible behaviour
 			// in pip or other tools
-			destWheelPath := path.Join(fullWheelDir, entry.Name())
+			destWheelPath := path.Join(*wheelDir, entry.Name())
 			err = renameIfNotExists(wheelPath, destWheelPath)
 			if err != nil {
 				panic(err)
 			}
-			wheelPath = path.Join(fullWheelDir, entry.Name())
+			wheelPath = path.Join(*wheelDir, entry.Name())
 		}
 		// TODO: Refactor this whole mess into another function somewhere
 		type wheelFilePartialInfo struct {
@@ -403,7 +413,8 @@ func main() {
 			filePath      string
 			useLocalWheel bool
 		}
-		wheelFiles := []wheelFilePartialInfo{wheelFilePartialInfo{link, wheelPath, !hasPyPILink}}
+		useLocalWheel := *wheelURLPrefix == "" && !hasPyPILink
+		wheelFiles := []wheelFilePartialInfo{wheelFilePartialInfo{link, wheelPath, useLocalWheel}}
 
 		packageName, version := wheelFileParts(entry.Name())
 
@@ -445,15 +456,20 @@ func main() {
 				}
 
 				if !*preferPyPI && *wheelDir != "" {
-					useLocalWheel = true
+					if *wheelURLPrefix != "" {
+						link = *wheelURLPrefix + filePart
+						panic(link)
+					} else {
+						useLocalWheel = true
+					}
 
-					finalPath := path.Join(fullWheelDir, filePart)
+					finalPath := path.Join(*wheelDir, filePart)
 					// we do not update the file if it exists, but use finalPath to compute sha256
 					err = renameIfNotExists(destPath, finalPath)
 					if err != nil {
 						panic(err)
 					}
-					destPath = path.Join(*wheelDir, filePart)
+					destPath = finalPath
 				}
 				wheelFiles = append(wheelFiles, wheelFilePartialInfo{link, destPath, useLocalWheel})
 			}
@@ -567,18 +583,16 @@ func main() {
 
 	// Lastly, make `http_file` repo rules for PyPI links.
 	fmt.Fprintln(outputBzlFile, "def pypi_repositories():")
-	wroteAtLeastOne := false
+	// Don't call existing_rules repeatedly:
+	// https://github.com/bazelbuild/bazel/blob/master/site/docs/skylark/cookbook.md#aggregating-over-the-build-file
+	fmt.Fprintln(outputBzlFile, "    existing_rules = native.existing_rules()")
 	for _, dependency := range dependencies {
 		sort.Sort(wheelsByPlatform(dependency.wheels))
 		for _, wheel := range dependency.wheels {
 			if !wheel.useLocalWheel {
-				wroteAtLeastOne = true
 				name := wheel.bazelWorkspaceName(workspacePrefix)
 				fmt.Fprintf(outputBzlFile, wheel.makeBazelRule(&name, wheelDir))
 			}
 		}
-	}
-	if !wroteAtLeastOne {
-		fmt.Fprintln(outputBzlFile, "    pass")
 	}
 }
