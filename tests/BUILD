@@ -330,3 +330,15 @@ sh_test(
     data=[":executable_data"],
     args=["--command=$(location :executable_data)", "--expected-output='hello from executable.sh'"],
 )
+
+pyz_binary(
+    name="run_other",
+    srcs=["run_other.py"],
+    data=[":helloworld"],
+)
+sh_test(
+    name="run_other_test",
+    srcs=["command_output_tester.py"],
+    data=[":run_other"],
+    args=["--command=$(location :run_other)", "--expected-output='run_other output: hello world'"],
+)

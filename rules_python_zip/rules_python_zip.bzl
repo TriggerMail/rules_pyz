@@ -245,8 +245,9 @@ def _pyz_binary_impl(ctx):
             fail('BUG: path should not exist: ' + init_dst)
         links[init_dst] = ctx.file._empty_init_py
 
-    runfiles = ctx.runfiles(root_symlinks=links)
-    return DefaultInfo(runfiles=runfiles)
+    # collect_default so we get transitive runfiles from data dependencies
+    runfiles = ctx.runfiles(root_symlinks=links, collect_default=True)
+    return [DefaultInfo(runfiles=runfiles)]
 
 
 pyz_binary = rule(
