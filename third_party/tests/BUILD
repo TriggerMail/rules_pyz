@@ -1,4 +1,4 @@
-load("//rules_python_zip:rules_python_zip.bzl", "pyz_binary", "pyz_test", "pyz_library")
+load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl", "pyz_binary", "pyz_test", "pyz_library")
 
 # tests that pyz_* rules can be in //third_party (need "licenses")
 pyz_binary(

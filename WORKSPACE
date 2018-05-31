@@ -1,8 +1,13 @@
-load("//third_party/pypi:pypi_rules.bzl", "pypi_repositories")
-pypi_repositories()
+workspace(name = "com_bluecore_rules_pyz")
 
-load("//rules_python_zip:rules_python_zip.bzl", "pyz_repositories")
+# Always load from the fully-qualified path inside this repository:
+# Otherwise Bazel does not consider separate copies to be the same. See:
+# https://github.com/bazelbuild/bazel/issues/3493
+load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl", "pyz_repositories")
 pyz_repositories()
 
-load("//pypi:pip.bzl", "pip_repositories")
+load("@com_bluecore_rules_pyz//pypi:pip.bzl", "pip_repositories")
 pip_repositories()
+
+load("@com_bluecore_rules_pyz//third_party/pypi:pypi_rules.bzl", "pypi_repositories")
+pypi_repositories()

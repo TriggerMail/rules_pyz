@@ -1,4 +1,4 @@
-load("//rules_python_zip:rules_python_zip.bzl", "pyz_binary", "pyz_test", "pyz_library")
+load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl", "pyz_binary", "pyz_test", "pyz_library")
 
 # Trivial python binary and test
 pyz_binary(
@@ -10,6 +10,23 @@ sh_test(
     srcs=["command_output_tester.py"],
     data=[":helloworld"],
     args=["--command=$(location :helloworld)", "--expected-output='hello world'"],
+)
+# Had a bug where entry_point got called twice
+pyz_binary(
+    name="helloworld_entry_point",
+    entry_point="helloworld",
+    deps=[":helloworld_lib"],
+)
+pyz_library(
+    name="helloworld_lib",
+    srcs=["helloworld.py"],
+    pythonroot=".",
+)
+sh_test(
+    name="helloworld_entry_point_test",
+    srcs=["command_output_tester.py"],
+    data=[":helloworld_entry_point"],
+    args=["--command=$(location :helloworld_entry_point)", "--expected-output='hello world'"],
 )
 
 # Multiple files and imports
@@ -33,14 +50,14 @@ sh_test(
     srcs=["command_output_tester.py"],
     data=[":hello_import_builtin"],
     args=["--command=$(location :hello_import_builtin)", "--expected-output='hello_import done'",
-        "--no-unzip"],
+        "--no-unzip", "--no-execute-directory"],
 )
 
 # Pythonroot test
 pyz_library(
     name="short_import",
     srcs=["shortimport.py"],
-    wheels=["@pypi_asn1crypto//file"],
+    deps=["//third_party/pypi:asn1crypto"],
     pythonroot=".",
 )
 pyz_binary(
@@ -52,7 +69,7 @@ sh_test(
     name="use_shortimport_test",
     srcs=["command_output_tester.py"],
     data=[":use_shortimport"],
-    args=["--command=$(location :use_shortimport)", "--expected-output=shortimport"],
+    args=["--command=$(location :use_shortimport)", "--expected-output=shortimport\n"],
 )
 
 # Tests zip entry point import side effects
@@ -71,13 +88,14 @@ sh_test(
 pyz_binary(
     name="pytest_bin",
     entry_point="pytest",
-    deps=["//rules_python_zip:pytest"]
+    deps=["//rules_python_zip/pytest"]
 )
 sh_test(
     name="pytest_test",
     srcs=["command_output_tester.py"],
     data=[":pytest_bin"],
-    args=["--command=$(location :pytest_bin)", "--expected-output='no tests ran'", "--expect-failure"],
+    args=["--command=$(location :pytest_bin)", "--extra-arg=--help",
+        "--expected-output='pytest-warnings:'"],
 )
 
 # An actual test! With verification that it produces XML output
@@ -96,6 +114,16 @@ sh_test(
     args=["$(location :trivial_test)"],
 )
 
+pyz_test(
+    name="trivial_test_pythonroot",
+    srcs=["trivial_test.py"],
+    pythonroot=".",
+    size="small",
+    timeout="short",
+    flaky=False,
+    local=0,
+)
+
 pyz_library(
     name="module",
     srcs=["module.py"],
@@ -104,12 +132,6 @@ pyz_test(
     name="import_lib_test",
     srcs=["import_lib_test.py"],
     deps=[":module"],
-)
-
-pyz_test(
-    name="import_wheel_test",
-    srcs=["import_wheel_test.py"],
-    wheels=["@pypi_py//file"],
 )
 
 pyz_binary(
@@ -232,7 +254,7 @@ pyz_binary(
 pyz_test(
     name="interpreter_path_test",
     srcs=["interpreter_path_test.py"],
-    #interpreter_path="/usr/bin/python2.7",
+    interpreter_path="/usr/bin/python2.7",
     data=[":interpreter_path"],
 )
 
@@ -249,15 +271,15 @@ pyz_library(
     zip_safe=False,
 )
 
-sh_test(
-    name="fork_test",
-    srcs=[":fork_test_bin"],
-)
-pyz_binary(
-    name="fork_test_bin",
-    srcs=["fork_test.py"],
-    deps=[":coding"]
-)
+# sh_test(
+#     name="fork_test",
+#     srcs=[":fork_test_bin"],
+# )
+# pyz_binary(
+#     name="fork_test_bin",
+#     srcs=["fork_test.py"],
+#     deps=[":coding"]
+# )
 
 pyz_binary(
     name="pkg_resources_weirdness",

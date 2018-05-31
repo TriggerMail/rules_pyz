@@ -42,6 +42,9 @@ def main():
         raise Exception('pytest .cache directory was created: should not be!')
     pycache_path = os.path.join(os.path.dirname(__file__), '__pycache__')
     if os.path.exists(pycache_path):
+        print 'WTF???'
+        os.system('ls ' + os.path.dirname(pycache_path))
+        print 'WTF???'
         raise Exception('pytest __pycache__ directory was created: should not be!')
 
     absolute_test_path = os.path.abspath(test_path)

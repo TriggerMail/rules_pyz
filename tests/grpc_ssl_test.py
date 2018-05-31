@@ -1,3 +1,14 @@
+import sys
+print sys.path
+
+import google
+print google.__path__
+import google.cloud
+print google.cloud.__path__
+import google.cloud.datastore_v1
+print google.cloud.datastore_v1.__path__
+import google.cloud.datastore_v1.proto
+print google.cloud.datastore_v1.proto.__path__
 from google.cloud.datastore_v1.proto import datastore_pb2
 from google.cloud.datastore_v1.proto import datastore_pb2_grpc
 import grpc

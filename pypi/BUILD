@@ -1,4 +1,5 @@
-load("//rules_python_zip:rules_python_zip.bzl", "pyz_binary", "pyz_library", "pyz_test")
+load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl",
+    "pyz_binary", "pyz_library", "pyz_test")
 
 pyz_binary(
     name="pip",
@@ -27,7 +28,7 @@ pyz_library(
     name="wheeltool_lib",
     srcs=["wheeltool.py"],
     pythonroot=".",
-    deps=["//rules_python_zip:setuptools"],
+    deps=["@pypi_setuptools//:lib"],
 )
 pyz_test(
     name="test_wheeltool",
@@ -43,8 +44,11 @@ pyz_library(
     #     "pip/_vendor/requests/cacerts.pem",
     #     "pip/_vendor/requests/certs.py",
     # ],
-    deps=["//rules_python_zip:setuptools"],
-    wheels=["@pypi_pip//file", "@pypi_wheel//file"],
+    deps=[
+        "@pypi_pip//:lib",
+        "@pypi_setuptools//:lib",
+        "@pypi_wheel//:lib",
+    ],
 )
 
 py_binary(
