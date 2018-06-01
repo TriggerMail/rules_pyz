@@ -61,16 +61,14 @@ def main():
     expected_output = args.expected_output
     expect_success = not args.expect_failure
 
-    print '1'
-    os.system('ls')
-    print '2' + os.path.dirname(command_path)
-    print os.getcwd()
-    os.system('ls ' + os.path.dirname(command_path))
     run_and_check([command_path] + args.extra_arg, expected_output, expect_success)
 
     if not args.no_execute_directory:
         print 'executing packaged directory ...'
         run_and_check(['python2.7', command_path + '_exedir'] + args.extra_arg,
+            expected_output, expect_success)
+        print 'executing directory/__main__.py'
+        run_and_check(['python2.7', command_path + '_exedir/__main__.py'] + args.extra_arg,
             expected_output, expect_success)
 
     # unpack the zip and try it again: it should work
@@ -86,10 +84,6 @@ def main():
     #         run_and_check(['python2.7', tempdir], expected_output, expect_success)
     #     finally:
     #         shutil.rmtree(tempdir)
-
-    # with some crazy import/path manipulation, running python directly can screw up
-    # print 'testing explicitly executing with python2.7 ...'
-    # run_and_check(['python2.7', command_path], expected_output, expect_success)
 
     print 'PASS'
 

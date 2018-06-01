@@ -17,6 +17,7 @@ def main():
     assert os.WEXITSTATUS(status_code) == 42
 
     assert os.path.exists(tests.coding.__file__)
+    print 'SUCCESS'
 
 
 if __name__ == '__main__':

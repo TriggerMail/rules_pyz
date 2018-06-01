@@ -35,11 +35,11 @@ class TestPrintFilePath(unittest.TestCase):
         # run the script directly
         self.run_and_check_regexps((BUILT_PATH,), regexps)
         # run the exedir
-        print 'XXXX', BUILT_PATH
         self.run_and_check_regexps(('python', BUILT_PATH + '_exedir',), regexps)
         # run exedir/__main__.py
         self.run_and_check_regexps(('python', BUILT_PATH + '_exedir/__main__.py',), regexps)
 
+    # TODO: Re-enable!
     # def test_execute_zipped(self):
     #     regexps = [
     #         '^main __file__: .+/print_file_path/tests/print_file_path.py',

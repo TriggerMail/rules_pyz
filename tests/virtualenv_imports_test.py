@@ -59,7 +59,7 @@ class TestVirtualenvImports(unittest.TestCase):
             self.assertEqual(0, code)
 
             # run the import test dir using the virtualenv python
-            # TODO: run the import test zip!
+            # TODO: fix the path and enable this test
             # Running __main__.py does fail: it does not yet clean sys.path
             # os.environ['PATH'] = orig_path_env
             # output, code = run_output_code((virtualenv_python, _IMPORT_SITE_PACKAGES_PATH + '_exedir'))
@@ -67,6 +67,7 @@ class TestVirtualenvImports(unittest.TestCase):
             # self.assertIn('ImportError: No module named google', output)
             # self.assertEqual(0, code)
 
+            # TODO: run the import test zip!
             # unzip the thing and run it
             # unzip_dir = tempdir + '/unzipped'
             # os.mkdir(unzip_dir)

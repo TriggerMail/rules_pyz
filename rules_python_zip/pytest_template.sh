@@ -5,9 +5,6 @@ set -euf -o pipefail
 
 RUNFILES=${TEST_SRCDIR:-${BASH_SOURCE[0]}.runfiles}
 
-# Set TEST_SRCDIR if the test is executed on the command line outside of bazel
-#export TEST_SRCDIR=${TEST_SRCDIR:-$RUNFILES}
-
 # pytest rewrites bytecode into __pycache__: no point with Bazel's sandbox
 export BAZEL_PYTHON_EXTRA_FLAGS="-B"
 

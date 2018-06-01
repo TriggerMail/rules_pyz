@@ -40,18 +40,6 @@ sh_test(
     data=[":hello_import"],
     args=["--command=$(location :hello_import)", "--expected-output='hello_import done'"],
 )
-py_binary(
-    name="hello_import_builtin",
-    main="hello_import.py",
-    srcs=["hello_import.py", "helloworld.py"],
-)
-sh_test(
-    name="hello_import_builtin_test",
-    srcs=["command_output_tester.py"],
-    data=[":hello_import_builtin"],
-    args=["--command=$(location :hello_import_builtin)", "--expected-output='hello_import done'",
-        "--no-unzip", "--no-execute-directory"],
-)
 
 # Pythonroot test
 pyz_library(
@@ -271,15 +259,17 @@ pyz_library(
     zip_safe=False,
 )
 
-# sh_test(
-#     name="fork_test",
-#     srcs=[":fork_test_bin"],
-# )
-# pyz_binary(
-#     name="fork_test_bin",
-#     srcs=["fork_test.py"],
-#     deps=[":coding"]
-# )
+sh_test(
+    name="fork_test",
+    srcs=["command_output_tester.py"],
+    data=[":fork_test_bin"],
+    args=["--command=$(location :fork_test_bin)", "--expected-output='SUCCESS'"],
+)
+pyz_binary(
+    name="fork_test_bin",
+    srcs=["fork_test.py"],
+    deps=[":coding"]
+ )
 
 pyz_binary(
     name="pkg_resources_weirdness",

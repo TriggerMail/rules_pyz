@@ -44,7 +44,7 @@ class TestPyzInterpreter(unittest.TestCase):
         if stdin_file is not None:
             stdin_file.seek(0)
 
-        # unzipped: TODO
+        # unzipped: TODO: Re-enable after we add the zip target back
         # tempdir = tempfile.mkdtemp()
         # try:
         #     zf = zipfile.ZipFile(_INTERPRETER_PATH)
