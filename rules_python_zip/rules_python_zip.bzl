@@ -245,8 +245,9 @@ def _pyz_binary_impl(ctx):
             fail('BUG: path should not exist: ' + init_dst)
         links[init_dst] = ctx.file._empty_init_py
 
-    # collect_default so we get transitive runfiles from data dependencies
-    runfiles = ctx.runfiles(root_symlinks=links, collect_default=True)
+    # collect_data so we get transitive runfiles from data dependencies
+    # TODO: This also duplicates data dependencies; can we avoid this somehow?
+    runfiles = ctx.runfiles(root_symlinks=links, collect_data=True)
     return [DefaultInfo(runfiles=runfiles)]
 
 

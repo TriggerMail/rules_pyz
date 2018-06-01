@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
 set -eu
 
-# Allow passing additional flags: used to pass -B when running pytest
+# TODO: Use Python to avoid env/bash dependency?
+# Python startup is ~10X slower, or ~3X even with -s -S -E
+
+# Allow passing additional flags to python: used to pass -B so pytest does not write .pyc
 BAZEL_PYTHON_EXTRA_FLAGS=${BAZEL_PYTHON_EXTRA_FLAGS:-}
 
-# if running from bazel, we need to look for the runfiles path
-# if running as a subcommand inside a runfiles, this will not exist
-RUNFILES="${TEST_SRCDIR:-${BASH_SOURCE[0]}.runfiles}"
+# Find the runfiles so we can find the correct exedir
+# if running inside bazel test, TEST_SRCDIR will be set to runfiles
+# if running from another bazel binary, we need to find .runfiles on the path
+# otherwise: running directly or from bazel run: use exe path + .runfiles
+if [ -z ${TEST_SRCDIR+x} ]; then
+    # TEST_SRCDIR is not set: check for .runfiles on the path
+    if [[ "${BASH_SOURCE[0]}" = *".runfiles"* ]]; then
+        RUNFILES=$(sed 's/\(^.*\.runfiles\).*/\1/' <<< "${BASH_SOURCE[0]}")
+    else
+        RUNFILES="${BASH_SOURCE[0]}.runfiles"
+    fi
+else
+    RUNFILES=${TEST_SRCDIR}
+fi
+
 MAIN_PATH="${RUNFILES}/{{MAIN_PATH}}"
 if [ ! -e "$MAIN_PATH" ]; then
     MAIN_PATH="${BASH_SOURCE[0]}_exedir/__main__.py"
