@@ -36,8 +36,10 @@ def run_and_check(args, expected_output, expect_success):
     elif returncode == 0:
         raise Exception('Failed: Expected failure but exited with code: %d' % (returncode))
 
-    if expected_output not in output:
-        raise Exception('Expected output "%s" not found' % (expected_output))
+    count = output.count(expected_output)
+    if count != 1:
+        raise Exception('Expected output %s found %d times (expected 1)' % (
+            repr(expected_output), count))
 
 
 def main():
@@ -45,34 +47,43 @@ def main():
     parser.add_argument('--command', required=True, help='command to execute')
     parser.add_argument('--expected-output', required=True,
         help='string that must exist in the output')
+    parser.add_argument('--no-execute-directory', action='store_true',
+        help='do not attempt to directly execute the target directory')
     parser.add_argument('--no-unzip', action='store_true',
         help='do not unzip and execute as a directory')
     parser.add_argument('--expect-failure', action='store_true',
         help='the command should exit with a code other than 0')
+    parser.add_argument('--extra-arg', action='append', default=[],
+        help='additional argument to be passed to the command')
     args = parser.parse_args()
 
     command_path = args.command
     expected_output = args.expected_output
     expect_success = not args.expect_failure
 
-    run_and_check([command_path], expected_output, expect_success)
+    run_and_check([command_path] + args.extra_arg, expected_output, expect_success)
+
+    if not args.no_execute_directory:
+        print 'executing packaged directory ...'
+        run_and_check(['python2.7', command_path + '_exedir'] + args.extra_arg,
+            expected_output, expect_success)
+        print 'executing directory/__main__.py'
+        run_and_check(['python2.7', command_path + '_exedir/__main__.py'] + args.extra_arg,
+            expected_output, expect_success)
 
     # unpack the zip and try it again: it should work
-    if not args.no_unzip:
-        print 'testing from unpacked zip ...'
-        tempdir = tempfile.mkdtemp()
-        try:
-            zf = PreservePermissionsZipFile(command_path)
-            zf.extractall(tempdir)
-            zf.close()
+    # TODO: re-enable when we add zip targets back
+    # if not args.no_unzip:
+    #     print 'testing from unpacked zip ...'
+    #     tempdir = tempfile.mkdtemp()
+    #     try:
+    #         zf = PreservePermissionsZipFile(command_path)
+    #         zf.extractall(tempdir)
+    #         zf.close()
 
-            run_and_check(['python2.7', tempdir], expected_output, expect_success)
-        finally:
-            shutil.rmtree(tempdir)
-
-    # with some crazy import/path manipulation, running python directly can screw up
-    print 'testing explicitly executing with python2.7 ...'
-    run_and_check(['python2.7', command_path], expected_output, expect_success)
+    #         run_and_check(['python2.7', tempdir], expected_output, expect_success)
+    #     finally:
+    #         shutil.rmtree(tempdir)
 
     print 'PASS'
 

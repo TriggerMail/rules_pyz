@@ -37,23 +37,23 @@ class TestPyzInterpreter(unittest.TestCase):
             stdin_file.seek(0)
 
         # prefixed with python
-        output = subprocess.check_output(('python', _INTERPRETER_PATH,) + args,
+        output = subprocess.check_output(('python', _INTERPRETER_PATH + '_exedir',) + args,
             stderr=subprocess.STDOUT)
         self.assertIn(expect_in_output, output)
 
         if stdin_file is not None:
             stdin_file.seek(0)
 
-        # unzipped
-        tempdir = tempfile.mkdtemp()
-        try:
-            zf = zipfile.ZipFile(_INTERPRETER_PATH)
-            zf.extractall(tempdir)
-            output = subprocess.check_output(('python', tempdir) + args, stderr=subprocess.STDOUT)
-            self.assertIn(expect_in_output, output)
+        # unzipped: TODO: Re-enable after we add the zip target back
+        # tempdir = tempfile.mkdtemp()
+        # try:
+        #     zf = zipfile.ZipFile(_INTERPRETER_PATH)
+        #     zf.extractall(tempdir)
+        #     output = subprocess.check_output(('python', tempdir) + args, stderr=subprocess.STDOUT)
+        #     self.assertIn(expect_in_output, output)
 
-        finally:
-            shutil.rmtree(tempdir)     
+        # finally:
+        #     shutil.rmtree(tempdir)     
 
     def test_interactive(self):
         # should work when directly executed, executed with Python, or unzipped

@@ -27,8 +27,19 @@ const pypiRulesHeader = `# AUTO GENERATED. DO NOT EDIT DIRECTLY.
 #   pypi/pip_generate \
 #     %s
 
+_BUILD_FILE_CONTENT='''
 load("%s", "%s")
-` + "\n"
+
+pyz_library(
+    name="lib",
+    srcs=glob(["**/*.py"]),
+    data = glob(["**/*"], exclude=["**/*.py", "BUILD", "WORKSPACE", "*.whl.zip"]),
+    pythonroot=".",
+    visibility=["//visibility:public"],
+)
+'''
+
+def pypi_repositories():` + "\n"
 
 var pipLogLinkPattern = regexp.MustCompile(`^\s*(Found|Skipping) link\s*(http[^ #]+\.whl)`)
 
@@ -500,6 +511,7 @@ func main() {
 	fmt.Fprintf(outputBzlFile, "\ndef pypi_libraries():\n")
 	// First, make the actual library targets.
 	for _, dependency := range dependencies {
+		sort.Sort(wheelsByPlatform(dependency.wheels))
 		fmt.Fprintf(outputBzlFile, "    %s(\n", ruleGenerator.libraryRule)
 		fmt.Fprintf(outputBzlFile, "        name=\"%s\",\n", dependency.bazelLibraryName())
 		if len(dependency.wheels) == 1 {
