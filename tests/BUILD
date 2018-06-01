@@ -269,7 +269,7 @@ pyz_binary(
     name="fork_test_bin",
     srcs=["fork_test.py"],
     deps=[":coding"]
- )
+)
 
 pyz_binary(
     name="pkg_resources_weirdness",
