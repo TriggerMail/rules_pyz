@@ -1,10 +1,14 @@
 #!/bin/bash
 set -euf -o pipefail
 
+echo WTF `pwd`
+
 # Download and install Bazel
-wget https://github.com/bazelbuild/bazel/releases/download/0.13.0/bazel-0.13.0-installer-linux-x86_64.sh
-chmod a+x bazel-0.13.0-installer-linux-x86_64.sh
-./bazel-0.13.0-installer-linux-x86_64.sh --user
+BAZEL_VERSION=0.14.0
+BAZEL_INSTALLER="bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"
+wget https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${BAZEL_INSTALLER}
+chmod a+x ${BAZEL_INSTALLER}
+./${BAZEL_INSTALLER} --user
 
 # Ensure everything can be built and tested
 ~/bin/bazel build //...

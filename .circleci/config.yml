@@ -7,4 +7,4 @@ jobs:
       - checkout
       - run: ./circleci.sh
       - store_test_results:
-          path: bazel-out/testlogs
+          path: rules_pyz/bazel-out/testlogs
