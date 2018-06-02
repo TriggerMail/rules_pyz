@@ -6,3 +6,6 @@
 # TODO: rules_pyz should be robust to this. In particular, it possibly should
 # not import site, which would avoid executing .pth files
 build --experimental_strict_action_env=true
+
+# More useful error output
+test --test_output=errors
