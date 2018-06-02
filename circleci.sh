@@ -11,7 +11,7 @@ chmod a+x ${BAZEL_INSTALLER}
 ./${BAZEL_INSTALLER} --user
 
 # Ensure everything can be built and tested
-~/bin/bazel test //... || (ls bazel-out)
+~/bin/bazel test //...
 ~/bin/bazel build //...
 
 # Ensure the Go tools can be built
