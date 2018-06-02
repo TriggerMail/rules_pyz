@@ -1,16 +1,18 @@
 load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl", "pyz_binary", "pyz_test", "pyz_library")
 
+load(":pyz_output_test.bzl", "pyz_output_test")
+
 # Trivial python binary and test
 pyz_binary(
     name="helloworld",
     srcs=["helloworld.py"],
 )
-sh_test(
+pyz_output_test(
     name="helloworld_test",
-    srcs=["command_output_tester.py"],
-    data=[":helloworld"],
-    args=["--command=$(location :helloworld)", "--expected-output='hello world'"],
+    pyz_binary=":helloworld",
+    expected_output="hello world",
 )
+
 # Had a bug where entry_point got called twice
 pyz_binary(
     name="helloworld_entry_point",
@@ -22,11 +24,10 @@ pyz_library(
     srcs=["helloworld.py"],
     pythonroot=".",
 )
-sh_test(
+pyz_output_test(
     name="helloworld_entry_point_test",
-    srcs=["command_output_tester.py"],
-    data=[":helloworld_entry_point"],
-    args=["--command=$(location :helloworld_entry_point)", "--expected-output='hello world'"],
+    pyz_binary=":helloworld_entry_point",
+    expected_output="hello world",
 )
 
 # Multiple files and imports
@@ -34,11 +35,10 @@ pyz_binary(
     name="hello_import",
     srcs=["hello_import.py", "helloworld.py"],
 )
-sh_test(
+pyz_output_test(
     name="hello_import_test",
-    srcs=["command_output_tester.py"],
-    data=[":hello_import"],
-    args=["--command=$(location :hello_import)", "--expected-output='hello_import done'"],
+    pyz_binary=":hello_import",
+    expected_output="hello_import done",
 )
 
 # Pythonroot test
@@ -53,11 +53,10 @@ pyz_binary(
     srcs=["use_shortimport.py", "helloworld.py"],
     deps=[":short_import"],
 )
-sh_test(
+pyz_output_test(
     name="use_shortimport_test",
-    srcs=["command_output_tester.py"],
-    data=[":use_shortimport"],
-    args=["--command=$(location :use_shortimport)", "--expected-output=shortimport\n"],
+    pyz_binary=":use_shortimport",
+    expected_output="shortimport\n",
 )
 
 # Tests zip entry point import side effects
@@ -65,11 +64,11 @@ pyz_binary(
     name="no_sys_import",
     srcs=["no_sys_import.py"],
 )
-sh_test(
+pyz_output_test(
     name="no_sys_import_test",
-    srcs=["command_output_tester.py"],
-    data=[":no_sys_import"],
-    args=["--command=$(location :no_sys_import)", "--expected-output=NameError", "--expect-failure"],
+    pyz_binary=":no_sys_import",
+    expected_output="NameError",
+    expect_failure=True,
 )
 
 # Tests the base pytest rule works
@@ -78,12 +77,11 @@ pyz_binary(
     entry_point="pytest",
     deps=["//rules_python_zip/pytest"]
 )
-sh_test(
+pyz_output_test(
     name="pytest_test",
-    srcs=["command_output_tester.py"],
-    data=[":pytest_bin"],
-    args=["--command=$(location :pytest_bin)", "--extra-arg=--help",
-        "--expected-output='pytest-warnings:'"],
+    pyz_binary=":pytest_bin",
+    expected_output="pytest-warnings:",
+    extra_arg="--help",
 )
 
 # An actual test! With verification that it produces XML output
@@ -130,11 +128,10 @@ pyz_binary(
         "//third_party/pypi:cffi",
     ],
 )
-sh_test(
+pyz_output_test(
     name="native_wheel_test",
-    srcs=["command_output_tester.py"],
-    data=[":native_wheel"],
-    args=["--command=$(location :native_wheel)", "--expected-output='hello from printf'"],
+    pyz_binary=":native_wheel",
+    expected_output="hello from printf",
 )
 
 pyz_binary(
@@ -142,12 +139,10 @@ pyz_binary(
     srcs=["native_wheel_nested.py"],
     deps=["//third_party/pypi:cryptography"]
 )
-sh_test(
+pyz_output_test(
     name="native_wheel_nested_test",
-    srcs=["command_output_tester.py"],
-    data=[":native_wheel_nested"],
-    args=["--command=$(location :native_wheel_nested)",
-        "--expected-output='openssl.backend.Backend object'"],
+    pyz_binary=":native_wheel_nested",
+    expected_output="openssl.backend.Backend object",
 )
 
 pyz_binary(
@@ -155,26 +150,22 @@ pyz_binary(
     srcs=["wheel_google_cloud.py"],
     deps=["//third_party/pypi:google_cloud_datastore"]
 )
-sh_test(
+pyz_output_test(
     name="wheel_google_cloud_test",
-    srcs=["command_output_tester.py"],
-    data=[":wheel_google_cloud"],
-    args=["--command=$(location :wheel_google_cloud)",
-        "--expected-output='google.cloud.datastore'"],
+    pyz_binary=":wheel_google_cloud",
+    expected_output="google.cloud.datastore",
 )
 
+# TODO: We always unzip in these rules for now: Add test when we enable zip_safe=True
 pyz_binary(
     name="force_unzip",
     srcs=["force_unzip.py"],
     data=["resource.txt"],
-    zip_safe=False,
 )
-sh_test(
+pyz_output_test(
     name="force_unzip_test",
-    srcs=["command_output_tester.py"],
-    data=[":force_unzip"],
-    args=["--command=$(location :force_unzip)",
-        "--expected-output='hello resource.txt'"],
+    pyz_binary=":force_unzip",
+    expected_output="hello resource.txt",
 )
 
 # tests zip entry point site-packages and tests pyz_test data attribute
@@ -182,37 +173,33 @@ pyz_binary(
     name="virtualenv",
     deps=["//third_party/pypi:virtualenv"],
     entry_point="virtualenv",
-    force_all_unzip=True,
 )
 pyz_binary(
     name="import_site_packages",
     srcs=["import_site_packages.py"],
 )
-sh_test(
+pyz_output_test(
     name="import_site_packages_test",
-    srcs=["command_output_tester.py"],
-    data=[":import_site_packages"],
-    args=["--command=$(location :import_site_packages)", "--expected-output='SUCCESS'"],
+    pyz_binary=":import_site_packages",
+    expected_output="SUCCESS",
 )
 pyz_test(
     name="virtualenv_imports_test",
     srcs=["virtualenv_imports_test.py"],
-    data=[":virtualenv", ":import_site_packages"]
+    data=[":virtualenv", ":import_site_packages", ":import_site_packages_exezip", ]
 )
 
 pyz_binary(
     name="print_file_path",
     srcs=["print_file_path.py"],
 )
-pyz_binary(
-    name="print_file_path_force_all_unzip",
-    srcs=["print_file_path.py"],
-    force_all_unzip=True,
-)
 pyz_test(
     name="print_file_path_test",
     srcs=["print_file_path_test.py"],
-    data=[":print_file_path", ":print_file_path_force_all_unzip"],
+    data=[
+        ":print_file_path",
+        ":print_file_path_exezip"
+    ],
 )
 
 pyz_binary(
@@ -223,7 +210,7 @@ pyz_binary(
 pyz_test(
     name="interpreter_test",
     srcs=["interpreter_test.py"],
-    data=[":interpreter"],
+    data=[":interpreter", ":interpreter_exezip"],
 )
 
 # Tests a complicated native code dependency
@@ -259,11 +246,10 @@ pyz_library(
     zip_safe=False,
 )
 
-sh_test(
+pyz_output_test(
     name="fork_test",
-    srcs=["command_output_tester.py"],
-    data=[":fork_test_bin"],
-    args=["--command=$(location :fork_test_bin)", "--expected-output='SUCCESS'"],
+    pyz_binary=":fork_test_bin",
+    expected_output="SUCCESS",
 )
 pyz_binary(
     name="fork_test_bin",
@@ -301,11 +287,10 @@ pyz_binary(
     srcs=["pytz_example.py"],
     deps=["//third_party/pypi:pytz"],
 )
-sh_test(
+pyz_output_test(
     name="pytz_example_test",
-    srcs=["command_output_tester.py"],
-    data=[":pytz_example"],
-    args=["--command=$(location :pytz_example)", "--expected-output='SUCCESS'"],
+    pyz_binary=":pytz_example",
+    expected_output="SUCCESS",
 )
 
 pyz_binary(
@@ -314,11 +299,10 @@ pyz_binary(
     data=["executable.sh"],
     zip_safe=False,
 )
-sh_test(
+pyz_output_test(
     name="executable_data_test",
-    srcs=["command_output_tester.py"],
-    data=[":executable_data"],
-    args=["--command=$(location :executable_data)", "--expected-output='hello from executable.sh'"],
+    pyz_binary=":executable_data",
+    expected_output="hello from executable.sh",
 )
 
 pyz_binary(
@@ -326,9 +310,8 @@ pyz_binary(
     srcs=["run_other.py"],
     data=[":helloworld"],
 )
-sh_test(
+pyz_output_test(
     name="run_other_test",
-    srcs=["command_output_tester.py"],
-    data=[":run_other"],
-    args=["--command=$(location :run_other)", "--expected-output='run_other output: hello world'"],
+    pyz_binary=":run_other",
+    expected_output="run_other output: hello world",
 )

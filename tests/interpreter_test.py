@@ -7,6 +7,7 @@ import zipfile
 
 
 _INTERPRETER_PATH = 'tests/interpreter'
+_INTERPRETER_PATH_ZIP = 'tests/interpreter_exezip'
 
 
 _SCRIPT = '''
@@ -17,6 +18,13 @@ print 'sys.argv:', repr(sys.argv)
 print '__file__:', __file__
 '''
 class TestPyzInterpreter(unittest.TestCase):
+    def run_and_expect(self, command, expect_in_output, stdin_file):
+        print 'XXX', command
+        output = subprocess.check_output(command, stdin=stdin_file, stderr=subprocess.STDOUT)
+        self.assertIn(expect_in_output, output)
+        if stdin_file is not None:
+            stdin_file.seek(0)
+
     def run_with_args_and_expect(self, args, expect_in_output, stdin_data=None):
         '''The command should run when directly executed, with Python, or unzipped.'''
 
@@ -28,32 +36,35 @@ class TestPyzInterpreter(unittest.TestCase):
             stdin_file.flush()
             stdin_file.seek(0)
 
-        # directly executed
-        output = subprocess.check_output((_INTERPRETER_PATH,) + args, stdin=stdin_file,
-            stderr=subprocess.STDOUT)
-        self.assertIn(expect_in_output, output)
+        # execute the wrapper script
+        self.run_and_expect((_INTERPRETER_PATH,) + args,
+            expect_in_output, stdin_file)
 
-        if stdin_file is not None:
-            stdin_file.seek(0)
+        # execute the dir and __main__.py
+        self.run_and_expect(('python', _INTERPRETER_PATH + '_exedir',) + args,
+            expect_in_output, stdin_file)
+        self.run_and_expect(('python', _INTERPRETER_PATH + '_exedir/__main__.py',) + args,
+            expect_in_output, stdin_file)
 
-        # prefixed with python
-        output = subprocess.check_output(('python', _INTERPRETER_PATH + '_exedir',) + args,
-            stderr=subprocess.STDOUT)
-        self.assertIn(expect_in_output, output)
+        # execute the zip
+        self.run_and_expect((_INTERPRETER_PATH_ZIP,) + args,
+            expect_in_output, stdin_file)
+        self.run_and_expect(('python', _INTERPRETER_PATH_ZIP) + args,
+            expect_in_output, stdin_file)
 
-        if stdin_file is not None:
-            stdin_file.seek(0)
+        # unzip and execute the directory
+        tempdir = tempfile.mkdtemp()
+        try:
+            zf = zipfile.ZipFile(_INTERPRETER_PATH_ZIP)
+            zf.extractall(tempdir)
 
-        # unzipped: TODO: Re-enable after we add the zip target back
-        # tempdir = tempfile.mkdtemp()
-        # try:
-        #     zf = zipfile.ZipFile(_INTERPRETER_PATH)
-        #     zf.extractall(tempdir)
-        #     output = subprocess.check_output(('python', tempdir) + args, stderr=subprocess.STDOUT)
-        #     self.assertIn(expect_in_output, output)
+            self.run_and_expect(('python', tempdir) + args,
+                expect_in_output, stdin_file)
+            self.run_and_expect(('python', tempdir + '/__main__.py') + args,
+                expect_in_output, stdin_file)
 
-        # finally:
-        #     shutil.rmtree(tempdir)     
+        finally:
+            shutil.rmtree(tempdir)
 
     def test_interactive(self):
         # should work when directly executed, executed with Python, or unzipped
