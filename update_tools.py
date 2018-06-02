@@ -8,7 +8,7 @@ GOOS_TO_BAZEL = {
     'linux': 'linux',
 }
 
-GO_TOOL_SRC = ('rules_python_zip/simplepack.go', 'pypi/pip_generate.go')
+GO_TOOL_SRC = ('pypi/pip_generate.go',)
 
 # TODO: Build 32-bit versions?
 GOARCH='amd64'
