@@ -84,6 +84,10 @@ def main():
     exec ast in clean_globals
 
 
+# Environment variables that can change imports and break a pyz_binary
+_STRIP_ENVVARS=set(('PYTHONHOME', 'PYTHONPATH', 'PYTHONSTARTUP'))
+
+
 def reexec_without_site_packages_if_needed():
     # Attempt to isolate the Python environment as much as possible:
     # -S: Disable site module: disables .pth files that could be customized
@@ -92,7 +96,7 @@ def reexec_without_site_packages_if_needed():
     # TODO: Copy pex's "site cleaning" code to avoid re-executing?
     if 'site' in sys.modules:
         # re-exec without any PYTHON environment variables and without site packages
-        clean_env = {k: v for k, v in os.environ.items() if not k.startswith('PYTHON')}
+        clean_env = {k: v for k, v in os.environ.items() if k not in _STRIP_ENVVARS}
         # ensure runpy is available: virtualenv python -S does not have it
         import runpy
         clean_env['PYTHONPATH'] = os.path.dirname(runpy.__file__)

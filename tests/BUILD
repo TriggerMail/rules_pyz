@@ -315,3 +315,14 @@ pyz_output_test(
     pyz_binary=":run_other",
     expected_output="run_other output: hello world",
 )
+
+pyz_binary(
+    name="python_envvars",
+    srcs=["python_envvars.py"],
+)
+pyz_output_test(
+    name="python_envvars_test",
+    pyz_binary="python_envvars",
+    expected_output="PYTHON_EXAMPLE=should be found",
+    extra_arg="$(location :python_envvars_exezip)",
+)

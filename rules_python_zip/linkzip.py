@@ -20,8 +20,7 @@ def copy_files(zf, files_json):
         # https://stackoverflow.com/questions/39296101/python-zipfile-removes-execute-permissions-from-binaries
         src_stat = os.stat(src)
         zinfo = zipfile.ZipInfo(dst, time.gmtime(src_stat.st_mtime))
-        if src_stat.st_mode & stat.S_IXUSR:
-            zinfo.external_attr = src_stat.st_mode << 16
+        zinfo.external_attr = src_stat.st_mode << 16
         zf.writestr(zinfo, data)
 
 
