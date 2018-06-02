@@ -134,45 +134,6 @@ def _pyz_binary_impl(ctx):
 
     provider = _get_transitive_provider(ctx)
 
-    # TODO: Add back zip targets?
-    # we must include setuptools in all pyz_binary: it includes pkg_resources which is needed
-    # to load resources from zip files
-    #if not ctx.attr.force_all_unzip:
-    #    has_setuptools = any(['/setuptools-' in f.path for f in provider.transitive_wheels])
-    #    if not has_setuptools:
-    #        provider = PyZProvider(
-    #            transitive_src_mappings=provider.transitive_src_mappings,
-    #            transitive_srcs=provider.transitive_srcs,
-    #            transitive_wheels=provider.transitive_wheels + [ctx.file._setuptools_whl],
-    #            transitive_force_unzip=provider.transitive_force_unzip,
-    #        )
-
-    #manifest = struct(
-    #    sources=provider.transitive_src_mappings.to_list(),
-    #    wheels=[f.path for f in provider.transitive_wheels],
-    #    entry_point=ctx.attr.entry_point,
-    #    interpreter=ctx.attr.interpreter,
-    #    interpreter_path=ctx.attr.interpreter_path,
-    #    force_unzip=provider.transitive_force_unzip.to_list(),
-    #    force_all_unzip=ctx.attr.force_all_unzip,
-    #)
-
-    #manifest_file = ctx.new_file(ctx.configuration.bin_dir, ctx.outputs.executable, '_manifest')
-    #ctx.actions.write(manifest_file, manifest.to_json())
-
-    # package all files into a zip
-    #inputs = depset(
-    #    direct=[ctx.file._simplepack, manifest_file],
-    #    transitive=[provider.transitive_srcs, provider.transitive_wheels]
-    #)
-    #ctx.actions.run(
-    #    inputs=inputs,
-    #    outputs=[ctx.outputs.executable],
-    #    arguments=[manifest_file.path, ctx.outputs.executable.path],
-    #    executable=ctx.executable._simplepack,
-    #    mnemonic="PackPython"
-    #)
-
     # Package all Python dependencies into a unique dir: Make it possible for a rule to depend on
     # two executables with conflicting imports (e.g. different versions)
     base_dir = ctx.workspace_name + '/' + ctx.outputs.executable.short_path + '_exedir'
@@ -248,7 +209,39 @@ def _pyz_binary_impl(ctx):
     # collect_data so we get transitive runfiles from data dependencies
     # TODO: This also duplicates data dependencies; can we avoid this somehow?
     runfiles = ctx.runfiles(root_symlinks=links, collect_data=True)
-    return [DefaultInfo(runfiles=runfiles)]
+
+    # provide an alternative target that packages everything into an executable zip
+    manifest_files = []
+    action_inputs = []
+    base_dir_prefix = base_dir + '/'
+    for dst, src in links.items():
+        # strip the base_dir from dst
+        if not dst.startswith(base_dir_prefix):
+            fail('invalid dst path: ' + dst)
+        dst = dst[len(base_dir_prefix):]
+
+        manifest_files.append(struct(src=src.path, dst=dst))
+        action_inputs.append(src)
+
+    manifest = struct(
+        output_path = ctx.outputs.exezip.path,
+        interpreter_path=interpreter_path,
+        files=manifest_files,
+    )
+    manifest_file = ctx.new_file(ctx.configuration.bin_dir, ctx.outputs.exezip, '_manifest')
+    ctx.actions.write(manifest_file, manifest.to_json())
+    ctx.actions.run(
+        inputs=[manifest_file] + action_inputs,
+        outputs=[ctx.outputs.exezip],
+        arguments=[manifest_file.path],
+        executable=ctx.file._linkzip,
+    )
+
+    # by default: only build the executable script and runfiles tree
+    return [DefaultInfo(
+        files=depset(direct=[ctx.outputs.executable]),
+        runfiles=runfiles
+    )]
 
 
 pyz_binary = rule(
@@ -265,10 +258,6 @@ pyz_binary = rule(
         # Forces the contents of the pyz_binary to be extracted and run from a temp dir.
         "force_all_unzip": attr.bool(default=False),
 
-        # "_setuptools_whl": attr.label(
-        #     allow_single_file=True,
-        #     default=Label("@pypi_setuptools//file")),
-
         "_main_template": attr.label(
             default="//rules_python_zip:main_template.py",
             allow_single_file=True,
@@ -277,10 +266,17 @@ pyz_binary = rule(
             default="//rules_python_zip:main_shell_template.sh",
             allow_single_file=True,
         ),
+        "_linkzip": attr.label(
+            default="//rules_python_zip:linkzip.py",
+            allow_single_file=True,
+            executable=True,
+            cfg="host",
+        ),
     },
     executable = True,
     outputs = {
         "main_py": "%{name}__main.py",
+        "exezip": "%{name}_exezip",
     },
 )
 

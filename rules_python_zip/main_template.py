@@ -1,14 +1,31 @@
 import errno
 import os
 import sys
+import zipimport
+
 
 MANIFEST_JSON = r'''{{MANIFEST_JSON}}'''
 
+
 def main():
+    # run without site-packages if this is a zip
+    reexec_without_site_packages_if_needed()
+
     main_dir = os.path.dirname(__file__)
     if sys.path[0] != main_dir:
-        # when executed as 'python foo.runfiles/.../__main__.py' the first path is PWD
+        # when executed as 'python .../__main__.py' sys.path[0] is the dir containing __file__,
+        # but it resolves all symlinks: change it to the directory containing __main__.py without
+        # resolving symlinks so this "works" in a bazel runfiles tree
         sys.path[0] = main_dir
+
+    # when executed as python dir/__main__.py: no __loader__
+    # when executed as python dir: __loader__ is pkgutil.ImpLoader
+    # when executed as python zip: __loader__ is zipimport.zipimporter
+    if '__loader__' in globals() and isinstance(__loader__, zipimport.zipimporter):
+        # this is a zip file! unpack it to a temporary directory
+        tempdir = unzip_to_tempdir()
+        sys.path[0] = tempdir
+        main_dir = tempdir
 
     # attempt to locate a virtualenv:
     # we don't want to import site, since that executes pth files and adds other non-standard paths
@@ -22,7 +39,8 @@ def main():
             break
         except IOError as e:
             # ignore not found errors
-            if e.errno != errno.ENOENT:
+            # ENOTDIR happens with zips because we try foo_exezip/orig-prefix.txt
+            if not (e.errno == errno.ENOENT or e.errno == errno.ENOTDIR):
                 raise
 
     # import json only after modifying sys.path
@@ -64,6 +82,63 @@ def main():
     ast = compile(script_data, script_path, 'exec', flags=0, dont_inherit=1)
     # execute the script with a clean state (no imports or variables)
     exec ast in clean_globals
+
+
+def reexec_without_site_packages_if_needed():
+    # Attempt to isolate the Python environment as much as possible:
+    # -S: Disable site module: disables .pth files that could be customized
+    # -s: Don't use user site directory to sys.path
+    # can't add -ESs to #! for zips: virtualenv doesn't have runpy, required to run .zip
+    # TODO: Copy pex's "site cleaning" code to avoid re-executing?
+    if 'site' in sys.modules:
+        # re-exec without any PYTHON environment variables and without site packages
+        clean_env = {k: v for k, v in os.environ.items() if not k.startswith('PYTHON')}
+        # ensure runpy is available: virtualenv python -S does not have it
+        import runpy
+        clean_env['PYTHONPATH'] = os.path.dirname(runpy.__file__)
+
+        command_line = [sys.executable, '-Ss'] + sys.argv
+        os.execve(command_line[0], command_line, clean_env)
+
+
+tempdir_create_pid = None
+def unzip_to_tempdir():
+    # don't import these modules unless we need to
+    import atexit
+    import tempfile
+    import zipfile
+    global tempdir_create_pid
+
+    # Extracts zips and preserves original permissions from Unix systems
+    # https://bugs.python.org/issue15795
+    # https://stackoverflow.com/questions/39296101/python-zipfile-removes-execute-permissions-from-binaries
+    class PreservePermissionsZipFile(zipfile.ZipFile):
+        def extract(self, member, path=None, pwd=None):
+            extracted_path = super(PreservePermissionsZipFile, self).extract(member, path, pwd)
+            info = self.getinfo(member)
+            original_attr = info.external_attr >> 16
+            if original_attr != 0:
+                os.chmod(extracted_path, original_attr)
+            return extracted_path
+
+    # create the dir and clean it up atexit:
+    # can't use a finally handler: it gets invoked BEFORE tracebacks are printed
+    tempdir = tempfile.mkdtemp('_pyzip')
+    tempdir_create_pid = os.getpid()
+    atexit.register(clean_tempdir_parent_only, tempdir)
+    sys.path.insert(0, tempdir)
+
+    package_zip = PreservePermissionsZipFile(__loader__.archive)
+    package_zip.extractall(path=tempdir)
+    return tempdir
+
+
+def clean_tempdir_parent_only(path):
+    '''Only delete the tempdir in the original process even in case of fork.'''
+    if os.getpid() == tempdir_create_pid:
+        import shutil
+        shutil.rmtree(path)
+
 
 # modified from virtualenv site.py
 def virtual_install_main_packages(real_prefix):

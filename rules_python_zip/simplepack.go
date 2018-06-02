@@ -510,6 +510,7 @@ def _copy_as_namespace(tempdir, unzipped_dir):
 def clean_tempdir_parent_only(path):
     '''Only delete the tempdir in the original process even in case of fork.'''
     if os.getpid() == tempdir_create_pid:
+        import shutil
         shutil.rmtree(path)
 
 
