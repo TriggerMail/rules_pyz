@@ -2,9 +2,9 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10.1-stretch
+      - image: circleci/golang:1.10.2-stretch
     steps:
       - checkout
       - run: ./circleci.sh
       - store_test_results:
-          path: rules_pyz/bazel-out/testlogs
+          path: bazel-out/linux-fastbuild/testlogs
