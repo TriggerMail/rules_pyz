@@ -30,10 +30,8 @@ def link_manifest(parsed_manifest):
     interpreter_path = parsed_manifest['interpreter_path']
     if not interpreter_path.startswith('/'):
         interpreter_path = '/usr/bin/env ' + interpreter_path
-    # -E: ignore PYTHON* environment variables
-    # -s: No user site
     # Cannot add -S: runpy is in site-packages and is needed to load a zip
-    interpreter_path += ' -Es'
+    # we have hacks in __main__.py to clean the environment, so don't pass args
 
     with open(output_path, 'wb') as f:
         f.write('#!')
