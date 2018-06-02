@@ -2,7 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10.1-stretch
+      - image: circleci/golang:1.10.2-stretch
     steps:
       - checkout
       - run: ./circleci.sh
+      - run:
+          command: ./flatten_test_logs_circleci.py bazel-testlogs /tmp/testlogs
+          when: always
+      - store_test_results:
+          path: /tmp/testlogs
