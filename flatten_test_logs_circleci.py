@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # bazel-testlogs contains test.xml in deeply nested directories
 # CircleCI wants only 1 level of directories
-import sys
 import os
 import shutil
+import sys
 
 def main():
     if len(sys.argv) != 3:

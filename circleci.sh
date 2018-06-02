@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euf -o pipefail
 
-echo WTF `pwd`
-
 # Download and install Bazel
 BAZEL_VERSION=0.14.0
 BAZEL_INSTALLER="bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"
