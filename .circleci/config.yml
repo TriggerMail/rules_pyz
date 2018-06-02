@@ -6,3 +6,5 @@ jobs:
     steps:
       - checkout
       - run: ./circleci.sh
+      - store_test_results:
+          path: bazel-out/testlogs

@@ -8,3 +8,4 @@ class TwoTests(unittest.TestCase):
         if 'SHOULD_FAIL' in os.environ:
             self.fail('SHOULD_FAIL environment variable set')
         pass
+        self.fail('definitely fail')
