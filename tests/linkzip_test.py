@@ -37,7 +37,8 @@ class TestLinkZip(unittest.TestCase):
             # use the external unzip command to unzip it
             unzip_dir = tempdir + '/unzip_dir'
             os.mkdir(unzip_dir)
-            subprocess.check_call(('unzip', '-d', unzip_dir, output_path))
+            # On Linux this exits with non-zero due to a warning about the header
+            subprocess.call(('unzip', '-d', unzip_dir, output_path))
 
             # execute the exe
             out = subprocess.check_output([unzip_dir + '/exe'])

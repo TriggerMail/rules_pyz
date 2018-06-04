@@ -8,8 +8,6 @@ wget https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${BA
 chmod a+x ${BAZEL_INSTALLER}
 ./${BAZEL_INSTALLER} --user
 
-unzip --version || echo WTF $?
-
 # Ensure everything can be built and tested
 ~/bin/bazel test --test_output=errors //...
 ~/bin/bazel build //...
