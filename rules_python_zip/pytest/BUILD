@@ -6,6 +6,7 @@ load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl", "pyz_libr
 pyz_library(
     name="pytest",
     deps=[
+        "@pypi_atomicwrites//:lib",
         "@pypi_attrs//:lib",
         "@pypi_funcsigs//:lib",
         "@pypi_more_itertools//:lib",

@@ -2,6 +2,8 @@ import urllib2
 import unittest
 import ssl
 
+# pip has some crazy import magic: index must be imported before requests
+import pip._internal.index
 import pip._vendor.requests
 import pip._vendor.requests.exceptions
 
@@ -19,6 +21,8 @@ class TestSSL(unittest.TestCase):
         self.assertIn('<html', data)
 
     def test_requests(self):
+        # Ensures we can verify the pypi.python.org certificate
+        # Mostly this ensures pip's bundled certificates file can be found when zipped
         exc_type = pip._vendor.requests.exceptions.SSLError
         with self.assertRaisesRegexp(exc_type, 'certificate verify failed'):
             pip._vendor.requests.get(BAD_URL)

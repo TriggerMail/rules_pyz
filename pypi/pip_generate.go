@@ -27,6 +27,8 @@ const pypiRulesHeader = `# AUTO GENERATED. DO NOT EDIT DIRECTLY.
 #   pypi/pip_generate \
 #     %s
 
+load("%s", "%s")
+
 _BUILD_FILE_CONTENT='''
 load("%s", "%s")
 
@@ -38,8 +40,7 @@ pyz_library(
     visibility=["//visibility:public"],
 )
 '''
-
-def pypi_repositories():` + "\n"
+`
 
 var pipLogLinkPattern = regexp.MustCompile(`^\s*(Found|Skipping) link\s*(http[^ #]+\.whl)`)
 
@@ -105,10 +106,12 @@ func (w *wheelInfo) makeBazelRule(name *string, wheelDir *string) string {
 		output += fmt.Sprintf("    )\n")
 	} else {
 		output += fmt.Sprintf("    if \"%s\" not in existing_rules:\n", *name)
-		output += fmt.Sprintf("        native.http_file(\n")
+		output += fmt.Sprintf("        native.new_http_archive(\n")
 		output += fmt.Sprintf("            name=\"%s\",\n", *name)
 		output += fmt.Sprintf("            url=\"%s\",\n", w.url)
 		output += fmt.Sprintf("            sha256=\"%s\",\n", w.sha256)
+		output += fmt.Sprintf("            build_file_content=_BUILD_FILE_CONTENT,\n")
+		output += fmt.Sprintf("            type=\"zip\",\n")
 		output += fmt.Sprintf("        )\n")
 	}
 	return output
@@ -122,7 +125,7 @@ func (w *wheelInfo) bazelTarget(workspacePrefix *string) string {
 		return fmt.Sprintf(":%s", w.bazelWorkspaceName(workspacePrefix))
 	} else {
 		// We use `http_file` repository rules for wheels available directly from PyPI.
-		return fmt.Sprintf("@%s//file", w.bazelWorkspaceName(workspacePrefix))
+		return fmt.Sprintf("@%s//:lib", w.bazelWorkspaceName(workspacePrefix))
 	}
 }
 
@@ -210,7 +213,7 @@ type wheelToolOutput struct {
 
 func wheelDependencies(pythonPath string, wheelToolPath string, path string) ([]string, map[string][]string, error) {
 	start := time.Now()
-	wheelToolProcess := exec.Command(pythonPath, wheelToolPath, path)
+	wheelToolProcess := exec.Command(wheelToolPath, path)
 	wheelToolProcess.Stderr = os.Stderr
 	outputBytes, err := wheelToolProcess.Output()
 	if err != nil {
@@ -498,40 +501,27 @@ func main() {
 				panic(err)
 			}
 
+			sort.Strings(deps)
 			wheels = append(wheels, wheelInfo{partialInfo.url, shaSum, deps, extras, partialInfo.useLocalWheel, partialInfo.filePath})
 		}
 
+		sort.Sort(wheelsByPlatform(wheels))
 		dependencies = append(dependencies, pyPIDependency{packageName, wheels})
 		installedPackages[packageName] = true
 	}
 
 	commandLineArguments := strings.Join(os.Args[1:], " ")
-	fmt.Fprintf(outputBzlFile, pypiRulesHeader, commandLineArguments, rulesPath, ruleGenerator.libraryRule)
+	fmt.Fprintf(outputBzlFile, pypiRulesHeader,
+		commandLineArguments,
+		rulesPath, ruleGenerator.libraryRule,
+		rulesPath, ruleGenerator.libraryRule)
 
 	fmt.Fprintf(outputBzlFile, "\ndef pypi_libraries():\n")
 	// First, make the actual library targets.
 	for _, dependency := range dependencies {
-		sort.Sort(wheelsByPlatform(dependency.wheels))
+
 		fmt.Fprintf(outputBzlFile, "    %s(\n", ruleGenerator.libraryRule)
 		fmt.Fprintf(outputBzlFile, "        name=\"%s\",\n", dependency.bazelLibraryName())
-		if len(dependency.wheels) == 1 {
-			fmt.Fprintf(outputBzlFile, "        %s=[\"%s\"],\n",
-				ruleGenerator.wheelAttribute, dependency.wheels[0].bazelTarget(workspacePrefix))
-		} else {
-			fmt.Fprintf(outputBzlFile, "        %s=select({\n", ruleGenerator.wheelAttribute)
-			for _, wheelInfo := range dependency.wheels {
-				selectPlatform := bazelPlatform(wheelInfo.fileName())
-				if selectPlatform == "" {
-					selectPlatform = "//conditions:default"
-				} else {
-					selectPlatform = *rulesWorkspace + "//rules_python_zip:" + selectPlatform
-				}
-				fmt.Fprintf(outputBzlFile, "                \"%s\": [\"%s\"],\n",
-					selectPlatform, wheelInfo.bazelTarget(workspacePrefix))
-			}
-			fmt.Fprintf(outputBzlFile, "        }),\n")
-		}
-
 		if unzipPackages[dependency.name] {
 			fmt.Fprintf(outputBzlFile, "        zip_safe=False,\n")
 		}
@@ -540,7 +530,27 @@ func main() {
 		for _, dep := range dependency.wheels[0].deps {
 			fmt.Fprintf(outputBzlFile, "            \"%s\",\n", pyPIToBazelPackageName(dep))
 		}
-		fmt.Fprintf(outputBzlFile, "        ],\n")
+		fmt.Fprintf(outputBzlFile, "        ]")
+
+		// append the wheels to the deps list
+		if len(dependency.wheels) == 1 {
+			fmt.Fprintf(outputBzlFile, " + [\"%s\"],\n",
+				dependency.wheels[0].bazelTarget(workspacePrefix))
+		} else {
+			fmt.Fprintf(outputBzlFile, " + select({\n")
+			for _, wheelInfo := range dependency.wheels {
+				selectPlatform := bazelPlatform(wheelInfo.fileName())
+				if selectPlatform == "" {
+					selectPlatform = "//conditions:default"
+				} else {
+					selectPlatform = *rulesWorkspace + "//rules_python_zip:" + selectPlatform
+				}
+				fmt.Fprintf(outputBzlFile, "            \"%s\": [\"%s\"],\n",
+					selectPlatform, wheelInfo.bazelTarget(workspacePrefix))
+			}
+			fmt.Fprintf(outputBzlFile, "        }),\n")
+		}
+
 		// Fixes build error TODO: different type? comment that this is not the right license?
 		fmt.Fprintf(outputBzlFile, "        licenses=[\"notice\"],\n")
 		fmt.Fprintf(outputBzlFile, "        visibility=[\"//visibility:public\"],\n")
@@ -584,7 +594,6 @@ func main() {
 
 	// Next, make `filegroup` targets for any wheels that we stored locally.
 	for _, dependency := range dependencies {
-		sort.Sort(wheelsByPlatform(dependency.wheels))
 		for _, wheel := range dependency.wheels {
 			if wheel.useLocalWheel {
 				name := wheel.bazelWorkspaceName(workspacePrefix)
@@ -594,12 +603,11 @@ func main() {
 	}
 
 	// Lastly, make `http_file` repo rules for PyPI links.
-	fmt.Fprintln(outputBzlFile, "def pypi_repositories():")
+	fmt.Fprintln(outputBzlFile, "\ndef pypi_repositories():")
 	// Don't call existing_rules repeatedly:
 	// https://github.com/bazelbuild/bazel/blob/master/site/docs/skylark/cookbook.md#aggregating-over-the-build-file
 	fmt.Fprintln(outputBzlFile, "    existing_rules = native.existing_rules()")
 	for _, dependency := range dependencies {
-		sort.Sort(wheelsByPlatform(dependency.wheels))
 		for _, wheel := range dependency.wheels {
 			if !wheel.useLocalWheel {
 				name := wheel.bazelWorkspaceName(workspacePrefix)
