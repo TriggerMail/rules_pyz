@@ -326,3 +326,9 @@ pyz_output_test(
     expected_output="PYTHON_EXAMPLE=should be found",
     extra_arg="$(location :python_envvars_exezip)",
 )
+
+pyz_test(
+    name="linkzip_test",
+    srcs=["linkzip_test.py"],
+    data=["//rules_python_zip:linkzip.py"],
+)
