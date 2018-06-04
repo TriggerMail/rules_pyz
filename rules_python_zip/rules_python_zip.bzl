@@ -408,14 +408,22 @@ pyz_library(
 def pyz_repositories():
     """Rules to be invoked from WORKSPACE to load remote dependencies."""
 
-    excludes = native.existing_rules().keys()
+    excludes = native.existing_rules()
 
     WHEEL_BUILD_CONTENT = wheel_build_content()
+    if 'pypi_atomicwrites' not in excludes:
+        native.new_http_archive(
+            name = 'pypi_atomicwrites',
+            url = 'https://files.pythonhosted.org/packages/0a/e8/cd6375e7a59664eeea9e1c77a766eeac0fc3083bb958c2b41ec46b95f29c/atomicwrites-1.1.5-py2.py3-none-any.whl',
+            sha256 = 'a24da68318b08ac9c9c45029f4a10371ab5b20e4226738e150e6e7c571630ae6',
+            build_file_content=WHEEL_BUILD_CONTENT,
+            type="zip",
+        )
     if 'pypi_attrs' not in excludes:
         native.new_http_archive(
             name = 'pypi_attrs',
-            url = 'https://pypi.python.org/packages/b5/60/4e178c1e790fd60f1229a9b3cb2f8bc2f4cc6ff2c8838054c142c70b5adc/attrs-17.4.0-py2.py3-none-any.whl',
-            sha256 = 'a17a9573a6f475c99b551c0e0a812707ddda1ec9653bed04c13841404ed6f450',
+            url = 'https://files.pythonhosted.org/packages/41/59/cedf87e91ed541be7957c501a92102f9cc6363c623a7666d69d51c78ac5b/attrs-18.1.0-py2.py3-none-any.whl',
+            sha256 = '4b90b09eeeb9b88c35bc642cbac057e45a5fd85367b985bd2809c62b7b939265',
             build_file_content=WHEEL_BUILD_CONTENT,
             type="zip",
         )
@@ -430,8 +438,8 @@ def pyz_repositories():
     if 'pypi_more_itertools' not in excludes:
         native.new_http_archive(
             name="pypi_more_itertools",
-            url="https://pypi.python.org/packages/4a/88/c28e2a2da8f3dc3a391d9c97ad949f2ea0c05198222e7e6af176e5bf9b26/more_itertools-4.1.0-py2-none-any.whl",
-            sha256="11a625025954c20145b37ff6309cd54e39ca94f72f6bb9576d1195db6fa2442e",
+            url="https://files.pythonhosted.org/packages/9e/92/d05d8679c3bcaa263169aa47de660080df36d35697855515745657c1ba78/more_itertools-4.2.0-py2-none-any.whl",
+            sha256="a18d870ef2ffca2b8463c0070ad17b5978056f403fb64e3f15fe62a52db21cc0",
             build_file_content=WHEEL_BUILD_CONTENT,
             type="zip",
         )
@@ -454,8 +462,8 @@ def pyz_repositories():
     if 'pypi_pytest' not in excludes:
         native.new_http_archive(
             name="pypi_pytest",
-            url="https://pypi.python.org/packages/ed/96/271c93f75212c06e2a7ec3e2fa8a9c90acee0a4838dc05bf379ea09aae31/pytest-3.5.0-py2.py3-none-any.whl",
-            sha256="6266f87ab64692112e5477eba395cfedda53b1933ccd29478e671e73b420c19c",
+            url="https://files.pythonhosted.org/packages/62/59/950a805f90587d6e2f3692cf43700becb7cdf6c16b06d84e7516b199236b/pytest-3.6.0-py2.py3-none-any.whl",
+            sha256="c76e93f3145a44812955e8d46cdd302d8a45fbfc7bf22be24fe231f9d8d8853a",
             build_file_content=WHEEL_BUILD_CONTENT,
             type="zip",
         )
@@ -470,8 +478,8 @@ def pyz_repositories():
     if 'pypi_setuptools' not in excludes:
         native.new_http_archive(
             name = 'pypi_setuptools',
-            url = 'https://pypi.python.org/packages/20/d7/04a0b689d3035143e2ff288f4b9ee4bf6ed80585cc121c90bfd85a1a8c2e/setuptools-39.0.1-py2.py3-none-any.whl',
-            sha256 = '8010754433e3211b9cdbbf784b50f30e80bf40fc6b05eb5f865fab83300599b8',
+            url = 'https://files.pythonhosted.org/packages/7f/e1/820d941153923aac1d49d7fc37e17b6e73bfbd2904959fffbad77900cf92/setuptools-39.2.0-py2.py3-none-any.whl',
+            sha256 = '8fca9275c89964f13da985c3656cb00ba029d7f3916b37990927ffdf264e7926',
             build_file_content=WHEEL_BUILD_CONTENT,
             type="zip",
         )

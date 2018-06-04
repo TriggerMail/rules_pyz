@@ -1,5 +1,5 @@
 import os
-import pip
+import pip._internal
 import sys
 
 
@@ -12,7 +12,7 @@ def main():
     if sys.path[0] == '':
         raise Exception('unexpected sys.path: ' + repr(sys.path))
     os.environ['PYTHONPATH'] = sys.path[0]
-    pip.main()
+    pip._internal.main()
 
 
 if __name__ == '__main__':

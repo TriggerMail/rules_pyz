@@ -5,20 +5,20 @@ def pip_repositories():
 
     build_content = wheel_build_content()
 
-    existing = native.existing_rules().keys()
+    existing = native.existing_rules()
     if 'pypi_pip' not in existing:
         native.new_http_archive(
             name = 'pypi_pip',
-            url = 'https://pypi.python.org/packages/ac/95/a05b56bb975efa78d3557efa36acaf9cf5d2fd0ee0062060493687432e03/pip-9.0.3-py2.py3-none-any.whl',
-            sha256 = 'c3ede34530e0e0b2381e7363aded78e0c33291654937e7373032fda04e8803e5',
+            url = 'https://files.pythonhosted.org/packages/0f/74/ecd13431bcc456ed390b44c8a6e917c1820365cbebcb6a8974d1cd045ab4/pip-10.0.1-py2.py3-none-any.whl',
+            sha256 = '717cdffb2833be8409433a93746744b59505f42146e8d37de6c62b430e25d6d7',
             build_file_content=build_content,
             type="zip",
         )
     if 'pypi_wheel' not in existing:
         native.new_http_archive(
             name = 'pypi_wheel',
-            url = 'https://pypi.python.org/packages/1b/d2/22cde5ea9af055f81814f9f2545f5ed8a053eb749c08d186b369959189a8/wheel-0.31.0-py2.py3-none-any.whl',
-            sha256 = '9cdc8ab2cc9c3c2e2727a4b67c22881dbb0e1c503d592992594c5e131c867107',
+            url = 'https://files.pythonhosted.org/packages/81/30/e935244ca6165187ae8be876b6316ae201b71485538ffac1d718843025a9/wheel-0.31.1-py2.py3-none-any.whl',
+            sha256 = '80044e51ec5bbf6c894ba0bc48d26a8c20a9ba629f4ca19ea26ecfcf87685f5f',
             build_file_content=build_content,
             type="zip",
         )
