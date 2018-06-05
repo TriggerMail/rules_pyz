@@ -163,6 +163,7 @@ func pyPIToBazelPackageName(packageName string) string {
 	packageName = strings.ToLower(packageName)
 	// PyPI packages contain -, but the wheel and bazel names convert them to _
 	packageName = strings.Replace(packageName, "-", "_", -1)
+	packageName = strings.Replace(packageName, ".", "_", -1)
 
 	// If the package contains an extras suffix of [], replace it with __
 	packageName = strings.Replace(packageName, "[", "__", -1)

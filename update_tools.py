@@ -11,16 +11,17 @@ GOOS_TO_BAZEL = {
 GO_TOOL_SRC = ('pypi/pip_generate.go',)
 
 # TODO: Build 32-bit versions?
-GOARCH='amd64'
+GOARCH = 'amd64'
 
 
 def main():
     script_dir = os.path.dirname(__file__)
 
     for src in GO_TOOL_SRC:
-        for goos, bazel_os in GOOS_TO_BAZEL.iteritems():
+        for goos, bazel_os in GOOS_TO_BAZEL.items():
             tool_name = os.path.splitext(os.path.basename(src))[0]
-            output = os.path.join(script_dir, 'tools', '%s-x64-%s' % (tool_name, bazel_os))
+            output = os.path.join(script_dir, 'tools',
+                                  '%s-x64-%s' % (tool_name, bazel_os))
             env = dict(os.environ)
             env['GOOS'] = goos
             env['GOARCH'] = GOARCH
