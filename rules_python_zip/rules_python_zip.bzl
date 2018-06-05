@@ -1,8 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-py_file_types = FileType([".py"])
-wheel_file_types = FileType([".whl"])
-
 PyZProvider = provider(fields = [
     "transitive_mappings",
     "transitive_force_unzip",
@@ -11,7 +8,7 @@ PyZProvider = provider(fields = [
 _pyz_attrs = {
     "srcs": attr.label_list(
         flags = ["DIRECT_COMPILE_TIME_INPUT"],
-        allow_files = py_file_types,
+        allow_files = [".py"],
     ),
     "deps": attr.label_list(
         allow_files = False,
@@ -19,7 +16,7 @@ _pyz_attrs = {
     ),
     "wheels": attr.label_list(
         flags = ["DIRECT_COMPILE_TIME_INPUT"],
-        allow_files = wheel_file_types,
+        allow_files = [".whl"],
     ),
     "pythonroot": attr.string(default = ""),
 

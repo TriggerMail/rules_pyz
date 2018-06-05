@@ -11,4 +11,4 @@ build --experimental_strict_action_env=true
 test --test_output=errors
 
 # Ensure we don't use the soon to be deprecated rules
-common --incompatible_remove_native_git_repository=True --incompatible_remove_native_http_archive=True
+common --incompatible_remove_native_git_repository=True --incompatible_remove_native_http_archive=True --incompatible_disallow_filetype=True
