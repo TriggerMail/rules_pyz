@@ -28,6 +28,7 @@ const pypiRulesHeader = `# AUTO GENERATED. DO NOT EDIT DIRECTLY.
 #     %s
 
 load("%s", "%s")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 _BUILD_FILE_CONTENT='''
 load("%s", "%s")
@@ -106,7 +107,7 @@ func (w *wheelInfo) makeBazelRule(name *string, wheelDir *string) string {
 		output += fmt.Sprintf("    )\n")
 	} else {
 		output += fmt.Sprintf("    if \"%s\" not in existing_rules:\n", *name)
-		output += fmt.Sprintf("        native.new_http_archive(\n")
+		output += fmt.Sprintf("        http_archive(\n")
 		output += fmt.Sprintf("            name=\"%s\",\n", *name)
 		output += fmt.Sprintf("            url=\"%s\",\n", w.url)
 		output += fmt.Sprintf("            sha256=\"%s\",\n", w.sha256)

@@ -1,3 +1,5 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 py_file_types = FileType([".py"])
 wheel_file_types = FileType([".whl"])
 
@@ -412,7 +414,7 @@ def pyz_repositories():
 
     WHEEL_BUILD_CONTENT = wheel_build_content()
     if 'pypi_atomicwrites' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name = 'pypi_atomicwrites',
             url = 'https://files.pythonhosted.org/packages/0a/e8/cd6375e7a59664eeea9e1c77a766eeac0fc3083bb958c2b41ec46b95f29c/atomicwrites-1.1.5-py2.py3-none-any.whl',
             sha256 = 'a24da68318b08ac9c9c45029f4a10371ab5b20e4226738e150e6e7c571630ae6',
@@ -420,7 +422,7 @@ def pyz_repositories():
             type="zip",
         )
     if 'pypi_attrs' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name = 'pypi_attrs',
             url = 'https://files.pythonhosted.org/packages/41/59/cedf87e91ed541be7957c501a92102f9cc6363c623a7666d69d51c78ac5b/attrs-18.1.0-py2.py3-none-any.whl',
             sha256 = '4b90b09eeeb9b88c35bc642cbac057e45a5fd85367b985bd2809c62b7b939265',
@@ -428,7 +430,7 @@ def pyz_repositories():
             type="zip",
         )
     if 'pypi_funcsigs' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name = 'pypi_funcsigs',
             url = 'https://pypi.python.org/packages/69/cb/f5be453359271714c01b9bd06126eaf2e368f1fddfff30818754b5ac2328/funcsigs-1.0.2-py2.py3-none-any.whl',
             sha256 = '330cc27ccbf7f1e992e69fef78261dc7c6569012cf397db8d3de0234e6c937ca',
@@ -436,7 +438,7 @@ def pyz_repositories():
             type="zip",
         )
     if 'pypi_more_itertools' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name="pypi_more_itertools",
             url="https://files.pythonhosted.org/packages/9e/92/d05d8679c3bcaa263169aa47de660080df36d35697855515745657c1ba78/more_itertools-4.2.0-py2-none-any.whl",
             sha256="a18d870ef2ffca2b8463c0070ad17b5978056f403fb64e3f15fe62a52db21cc0",
@@ -444,7 +446,7 @@ def pyz_repositories():
             type="zip",
         )
     if 'pypi_pluggy' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name = 'pypi_pluggy',
             url = 'https://files.pythonhosted.org/packages/82/05/43e3947125a2137cba4746135c75934ceed1863f27e050fc560052104a71/pluggy-0.6.0-py2-none-any.whl',
             sha256 = 'd345c8fe681115900d6da8d048ba67c25df42973bda370783cd58826442dcd7c',
@@ -452,7 +454,7 @@ def pyz_repositories():
             type="zip",
         )
     if 'pypi_py' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name="pypi_py",
             url="https://pypi.python.org/packages/67/a5/f77982214dd4c8fd104b066f249adea2c49e25e8703d284382eb5e9ab35a/py-1.5.3-py2.py3-none-any.whl",
             sha256="983f77f3331356039fdd792e9220b7b8ee1aa6bd2b25f567a963ff1de5a64f6a",
@@ -460,7 +462,7 @@ def pyz_repositories():
             type="zip",
         )
     if 'pypi_pytest' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name="pypi_pytest",
             url="https://files.pythonhosted.org/packages/62/59/950a805f90587d6e2f3692cf43700becb7cdf6c16b06d84e7516b199236b/pytest-3.6.0-py2.py3-none-any.whl",
             sha256="c76e93f3145a44812955e8d46cdd302d8a45fbfc7bf22be24fe231f9d8d8853a",
@@ -468,7 +470,7 @@ def pyz_repositories():
             type="zip",
         )
     if 'pypi_six' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name = 'pypi_six',
             url = 'https://pypi.python.org/packages/67/4b/141a581104b1f6397bfa78ac9d43d8ad29a7ca43ea90a2d863fe3056e86a/six-1.11.0-py2.py3-none-any.whl',
             sha256 = '832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb',
@@ -476,7 +478,7 @@ def pyz_repositories():
             type="zip",
         )
     if 'pypi_setuptools' not in excludes:
-        native.new_http_archive(
+        http_archive(
             name = 'pypi_setuptools',
             url = 'https://files.pythonhosted.org/packages/7f/e1/820d941153923aac1d49d7fc37e17b6e73bfbd2904959fffbad77900cf92/setuptools-39.2.0-py2.py3-none-any.whl',
             sha256 = '8fca9275c89964f13da985c3656cb00ba029d7f3916b37990927ffdf264e7926',
