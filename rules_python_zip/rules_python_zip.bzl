@@ -169,7 +169,7 @@ def _pyz_binary_impl(ctx):
     )
 
     links = {main_py_path: ctx.outputs.main_py}
-    for mapping in provider.transitive_mappings:
+    for mapping in mappings_list:
         links[base_dir + '/' + mapping.dst] = mapping.src
 
     # find directories containing python source files without __init__.py
@@ -296,7 +296,8 @@ def _pyz_script_test_impl(ctx):
     for f in ctx.files.srcs:
         # Map each test src to the final path, based on pythonroot        
         dest_path = ''
-        for mapping in pyz_provider.transitive_mappings:
+        # TODO: Optimize this loop
+        for mapping in pyz_provider.transitive_mappings.to_list():
             if mapping.src == f:
                 dest_path = mapping.dst
                 break
