@@ -243,9 +243,15 @@ def _pyz_binary_impl(ctx):
     )]
 
 
+def _dict_merge(orig_dict, additional_dict):
+    new_dict = dict(orig_dict)
+    new_dict.update(additional_dict)
+    return new_dict
+
+
 pyz_binary = rule(
     _pyz_binary_impl,
-    attrs = _pyz_attrs + {
+    attrs = _dict_merge(_pyz_attrs, {
         "entry_point": attr.string(default=""),
 
         # If True, act like a Python interpreter: interactive shell or execute scripts
@@ -271,7 +277,7 @@ pyz_binary = rule(
             executable=True,
             cfg="host",
         ),
-    },
+    }),
     executable = True,
     outputs = {
         "main_py": "%{name}__main.py",
@@ -321,7 +327,7 @@ def _pyz_script_test_impl(ctx):
 
 _pyz_script_test = rule(
     _pyz_script_test_impl,
-    attrs = _pyz_attrs + {
+    attrs = _dict_merge(_pyz_attrs, {
         "test_executable": attr.label(
             mandatory=True,
             executable=True,
@@ -334,7 +340,7 @@ _pyz_script_test = rule(
 
         # required so the pyz_test can be used in third_party without error
         "licenses": attr.license(),
-    },
+    }),
     executable = True,
     test = True,
 )
