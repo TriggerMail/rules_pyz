@@ -295,22 +295,20 @@ def _pyz_script_test_impl(ctx):
     pyz_provider = _get_transitive_provider(ctx)
 
     # run the pyz_binary with all the test dependencies, with the srcs on the command line
+    # find the mapped paths of the test srcs
+    unmapped_test_files = {f: True for f in ctx.files.srcs}
     test_file_paths = []
-    for f in ctx.files.srcs:
-        # Map each test src to the final path, based on pythonroot        
-        dest_path = ''
-        # TODO: Optimize this loop
-        for mapping in pyz_provider.transitive_mappings.to_list():
-            if mapping.src == f:
-                dest_path = mapping.dst
+    for mapping in pyz_provider.transitive_mappings.to_list():
+        if mapping.src in unmapped_test_files:
+            test_file_paths.append(mapping.dst)
+            unmapped_test_files.pop(mapping.src)
+            if len(unmapped_test_files) == 0:
                 break
-        if dest_path == '':
-            fail('could not find file: ' + repr(f))
+    if len(unmapped_test_files) > 0:
+        fail('could not find files:' + repr(unmapped_test_files))
 
-        # TODO: Bash escape?
-        runfiles_path = "${RUNFILES}/" + pytest_runner + "_exedir/" + dest_path
-        test_file_paths.append(runfiles_path)
-
+    # TODO: Bash escape?
+    test_file_paths = ["${RUNFILES}/" + pytest_runner + "_exedir/" + p for p in test_file_paths]
     ctx.actions.expand_template(
         template = ctx.file._pytest_template,
         output = ctx.outputs.executable,
