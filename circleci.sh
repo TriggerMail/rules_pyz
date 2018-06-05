@@ -12,8 +12,9 @@ chmod a+x ${BAZEL_INSTALLER}
 ~/bin/bazel test --test_output=errors //...
 ~/bin/bazel build //...
 
-# Ensure the Go tools can be built
-./update_tools.py
+# Ensure the Go tools can be built and the script works with both versions of python
+python2.7 ./update_tools.py
+python3 ./update_tools.py
 
 # Ensure Go source is formatted
 NOT_FORMATTED=$(go fmt ./...)
