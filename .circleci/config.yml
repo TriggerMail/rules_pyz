@@ -5,6 +5,8 @@ jobs:
       - image: circleci/golang:1.10.2-stretch
     steps:
       - checkout
+      # Ensure the rules can work with both python2.7 and python3: Install both versions
+      - run: sudo apt-get install --yes python3-minimal
       - run: ./circleci.sh
       - run:
           command: ./flatten_test_logs_circleci.py bazel-testlogs /tmp/testlogs
