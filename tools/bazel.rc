@@ -12,4 +12,4 @@ test --test_output=errors
 
 # Ensure we don't use features that are going to be deprecated. See:
 # https://docs.bazel.build/versions/master/skylark/backward-compatibility.html
-common --incompatible_remove_native_git_repository=True --incompatible_remove_native_http_archive=True --incompatible_disallow_dict_plus=True --incompatible_depset_is_not_iterable=True
+common --all_incompatible_changes

@@ -96,23 +96,26 @@ def _get_transitive_provider(ctx):
                 dst = dst[len(prefix):]
             direct_mappings.append(struct(src=f, dst=dst))
 
-    # combine with transitive mappings
-    transitive_mappings = depset(direct=direct_mappings)
     force_unzips = []
     if not ctx.attr.zip_safe:
         # not zip safe: list all the files in this target as requiring unzipping
         force_unzips = [m.dst for m in direct_mappings]
         # Also list the wheel contents as needing unzipping
         # TODO: Make this a separate attribute?
-        force_unzips += [f.path for f in ctx.files.wheels]
-    transitive_force_unzip = depset(direct=force_unzips)
-    for dep in ctx.attr.deps:
-        transitive_mappings += dep[PyZProvider].transitive_mappings
-        transitive_force_unzip += dep[PyZProvider].transitive_force_unzip
+        force_unzips.extend([f.path for f in ctx.files.wheels])
 
+    # combine with transitive mappings
+    transitive_mappings = []
+    transitive_force_unzips = []
+    for dep in ctx.attr.deps:
+        transitive_mappings.append(dep[PyZProvider].transitive_mappings)
+        transitive_force_unzips.append(dep[PyZProvider].transitive_force_unzip)
+
+    # order is critical: need direct srcs to be first so we can pick the "main" script
+    transitive_mappings = depset(direct=direct_mappings, transitive=transitive_mappings, order="preorder")
     return PyZProvider(
         transitive_mappings=transitive_mappings,
-        transitive_force_unzip=transitive_force_unzip,
+        transitive_force_unzip=depset(direct=force_unzips, transitive=transitive_force_unzips),
     )
 
 def _pyz_library_impl(ctx):
