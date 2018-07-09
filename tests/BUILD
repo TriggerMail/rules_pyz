@@ -92,6 +92,7 @@ pyz_test(
     timeout="short",
     flaky=False,
     local=0,
+    tags=["unused-but-ensures-tags-work"],
 )
 sh_test(
     name="pytest_output_test",

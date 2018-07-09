@@ -348,9 +348,9 @@ _pyz_script_test = rule(
 )
 
 
-def pyz_test(name, srcs=[], data=[], deps=[], pythonroot=None, force_all_unzip=False,
-    interpreter_path=None,
-    flaky=None, licenses=[], local=None, timeout=None, shard_count=None, size=None):
+def pyz_test(name, srcs=[], data=[], deps=[], pythonroot=None,
+    force_all_unzip=False, interpreter_path=None, flaky=None, licenses=[],
+    local=None, timeout=None, shard_count=None, size=None, tags=[]):
     '''Macro that outputs a pyz_binary with all the test code and executes it with a shell script
     to pass the correct arguments.'''
 
@@ -393,6 +393,7 @@ def pyz_test(name, srcs=[], data=[], deps=[], pythonroot=None, force_all_unzip=F
         shard_count = shard_count,
         size = size,
         timeout = timeout,
+        tags = tags,
     )
 
 def wheel_build_content():
