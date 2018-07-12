@@ -81,7 +81,7 @@ def main():
 
     ast = compile(script_data, script_path, 'exec', flags=0, dont_inherit=1)
     # execute the script with a clean state (no imports or variables)
-    exec ast in clean_globals
+    exec(ast, clean_globals)
 
 
 # Environment variables that can change imports and break a pyz_binary

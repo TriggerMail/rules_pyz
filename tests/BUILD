@@ -13,6 +13,19 @@ pyz_output_test(
     expected_output="hello world",
 )
 
+# Trivial python binary and test
+pyz_binary(
+    name="hello_py3",
+    srcs=["hello_py3.py"],
+    interpreter_path="python3",
+)
+pyz_output_test(
+    name="hello_py3_test",
+    pyz_binary=":hello_py3",
+    expected_output="bytes == unicode? False",
+    tags=["python3"],
+)
+
 # Had a bug where entry_point got called twice
 pyz_binary(
     name="helloworld_entry_point",

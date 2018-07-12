@@ -60,14 +60,25 @@ def main():
     expected_output = args.expected_output
     expect_success = not args.expect_failure
 
+    # parse the interpreter line from the command_path
+    # TODO: Figure out how to use a proper Bazel toolchain
+    python_interpreter = 'python'
+    with open(command_path) as f:
+        for line in f:
+            if line.startswith('exec '):
+                parts = line.split(' ')
+                python_interpreter = parts[1]
+                break
+
     run_and_check([command_path] + args.extra_arg, expected_output, expect_success)
 
     if not args.no_execute_directory:
         print 'executing packaged directory ...'
-        run_and_check(['python2.7', command_path + '_exedir'] + args.extra_arg,
+        print [python_interpreter, command_path + '_exedir'] + args.extra_arg
+        run_and_check([python_interpreter, command_path + '_exedir'] + args.extra_arg,
             expected_output, expect_success)
         print 'executing directory/__main__.py'
-        run_and_check(['python2.7', command_path + '_exedir/__main__.py'] + args.extra_arg,
+        run_and_check([python_interpreter, command_path + '_exedir/__main__.py'] + args.extra_arg,
             expected_output, expect_success)
 
     # unpack the zip and try it again
@@ -82,9 +93,9 @@ def main():
             zf.extractall(tempdir)
             zf.close()
 
-            run_and_check(['python2.7', tempdir] + args.extra_arg,
+            run_and_check([python_interpreter, tempdir] + args.extra_arg,
                 expected_output, expect_success)
-            run_and_check(['python2.7', tempdir + '/__main__.py'] + args.extra_arg,
+            run_and_check([python_interpreter, tempdir + '/__main__.py'] + args.extra_arg,
                 expected_output, expect_success)
         finally:
             shutil.rmtree(tempdir)
