@@ -1,5 +1,5 @@
 
-def pyz_output_test(name, pyz_binary, expected_output, extra_arg="", expect_failure=False):
+def pyz_output_test(name, pyz_binary, expected_output, extra_arg="", expect_failure=False, tags=[]):
     args=[
         "--command=$(location " + pyz_binary + ")",
         "--zip-command=$(location " + pyz_binary + "_exezip)",
@@ -14,4 +14,5 @@ def pyz_output_test(name, pyz_binary, expected_output, extra_arg="", expect_fail
         srcs=["command_output_tester.py"],
         data=[pyz_binary, pyz_binary + "_exezip"],
         args=args,
+        tags=tags,
     )
