@@ -27,7 +27,6 @@ _pyz_attrs = {
 
     "data": attr.label_list(
         allow_files = True,
-        cfg = "data",
     ),
 
     # this target's direct files must be unzipped to be executed. This is usually
