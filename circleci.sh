@@ -2,7 +2,7 @@
 set -euf -o pipefail
 
 # Download and install Bazel
-BAZEL_VERSION=0.14.0
+BAZEL_VERSION=0.16.0
 BAZEL_INSTALLER="bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"
 wget https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${BAZEL_INSTALLER}
 chmod a+x ${BAZEL_INSTALLER}
