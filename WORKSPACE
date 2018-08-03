@@ -11,3 +11,8 @@ pip_repositories()
 
 load("@com_bluecore_rules_pyz//third_party/pypi:pypi_rules.bzl", "pypi_repositories")
 pypi_repositories()
+
+load("@com_bluecore_rules_pyz//pyz_image:docker.bzl", "pyz_rules_docker_repositories")
+pyz_rules_docker_repositories()
+load("@com_bluecore_rules_pyz//pyz_image:image.bzl", "pyz_image_repositories")
+pyz_image_repositories()
