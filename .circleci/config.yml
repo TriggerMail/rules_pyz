@@ -2,9 +2,11 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10.2-stretch
+      - image: circleci/golang:1.10.3-stretch
     steps:
       - checkout
+      # pyz_image tests depend on being able to run docker stuff
+      - setup_remote_docker
       # Ensure the rules can work with both python2.7 and python3: Install both versions
       - run: sudo apt-get install --yes python3-minimal
       - run: ./circleci.sh
