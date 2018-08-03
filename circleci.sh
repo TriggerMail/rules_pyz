@@ -26,3 +26,24 @@ if [[ -n "$NOT_FORMATTED" ]]; then
     echo "$NOT_FORMATTED" > /dev/stderr
     exit 1
 fi
+
+# Ensure the rules work with older versions of Bazel
+# Copy the test workspace elsewhere and go to it
+# Installing Bazel inside a workspace executes tools/bazel.rc which can break old versions
+cp -r testworkspace /tmp
+COMMIT=$(git rev-parse HEAD)
+REMOTE=file://$(pwd)
+perl -pi -e "s/REPLACECOMMIT/${COMMIT}/" /tmp/testworkspace/WORKSPACE
+perl -pi -e "s#REPLACEREMOTE#${REMOTE}#" /tmp/testworkspace/WORKSPACE
+cd /tmp/testworkspace
+
+OLD_BAZEL_VERSION=0.14.1
+OLD_BAZEL_INSTALLER="bazel-${OLD_BAZEL_VERSION}-installer-linux-x86_64.sh"
+OLD_BAZEL_PREFIX=${HOME}/bazel-${OLD_BAZEL_VERSION}
+wget https://github.com/bazelbuild/bazel/releases/download/${OLD_BAZEL_VERSION}/${OLD_BAZEL_INSTALLER}
+chmod a+x ${OLD_BAZEL_INSTALLER}
+./${OLD_BAZEL_INSTALLER} --prefix=${OLD_BAZEL_PREFIX}
+
+${OLD_BAZEL_PREFIX}/bin/bazel test //...
+${OLD_BAZEL_PREFIX}/bin/bazel run //:binary
+${OLD_BAZEL_PREFIX}/bin/bazel version
