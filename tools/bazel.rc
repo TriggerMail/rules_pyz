@@ -14,7 +14,8 @@ test --test_output=errors
 # https://docs.bazel.build/versions/master/skylark/backward-compatibility.html
 #
 # rules_docker currently uses a bunch of incompatible flags; until it is fixed add incompatible changes then disable a few
-common --all_incompatible_changes --incompatible_no_support_tools_in_action_inputs=false --incompatible_new_actions_api=false
+# Bazel 0.14.1 requires cfg = "data" while Bazel 0.16 complains about it: disable for now
+common --all_incompatible_changes --incompatible_no_support_tools_in_action_inputs=false --incompatible_new_actions_api=false --incompatible_disallow_data_transition=false
 
 # Allow passing through docker environment variables: makes remote docker work on CircleCI
 build --action_env=DOCKER_TLS_VERIFY --action_env=DOCKER_HOST --action_env=DOCKER_CERT_PATH --action_env=DOCKER_MACHINE_NAME
