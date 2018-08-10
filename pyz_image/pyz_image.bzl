@@ -31,19 +31,3 @@ def pyz2_image(name, binary, base=BASE_PY2_CONTAINER_IMAGE, entrypoint=None, **k
 
 def pyz3_image(name, binary, base=BASE_PY3_CONTAINER_IMAGE, entrypoint=["python3", "/pyz_binary"], **kwargs):
     return pyz2_image(name, binary, base, entrypoint, **kwargs)
-
-
-# Workaround for https://github.com/bazelbuild/bazel/issues/5633
-def rename_debs(debs):
-    outs = []
-    for i, downloaded_deb in enumerate(debs):
-        name = "deb_{}".format(i)
-        out = "{}.deb".format(name)
-        outs.append(out)
-        native.genrule(
-            name=name,
-            outs=["{}.deb".format(name)],
-            srcs=[downloaded_deb],
-            cmd="cp $< $@",
-        )
-    return outs

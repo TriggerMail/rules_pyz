@@ -6,7 +6,8 @@ import sys
 import tempfile
 
 
-CONTAINER_IMAGE_PATH = 'pyz_image/py2_image_base'
+CONTAINER_IMAGE_PATH = 'pyz2_image_base/image'
+DOCKER_IMAGE_TAG = 'bazel/image:image'
 
 
 def main():
@@ -15,25 +16,21 @@ def main():
         sys.exit(1)
     output_path = sys.argv[1]
 
-    guess_runfiles = sys.argv[0] + '.runfiles'
-    container_path = CONTAINER_IMAGE_PATH
-    if os.path.exists(guess_runfiles):
-        # container_image script looks for this environment variable
-        guess_runfiles = os.path.abspath(guess_runfiles)
-        os.environ['PYTHON_RUNFILES'] = guess_runfiles
-        container_path = guess_runfiles + '/com_bluecore_rules_pyz/' + container_path
+    guess_runfiles = os.path.abspath(sys.argv[0] + '.runfiles')
+    # container_image script looks for this environment variable
+    os.environ['PYTHON_RUNFILES'] = guess_runfiles
+    container_load_path = guess_runfiles + '/' + CONTAINER_IMAGE_PATH + '/image'
 
-    print('loading image {} ...'.format(container_path))
-    subprocess.check_call((container_path, ))
+    print('loading image {} ...'.format(container_load_path))
+    subprocess.check_call((container_load_path, ))
 
-    docker_tag = 'bazel/' + CONTAINER_IMAGE_PATH.replace('/', ':')
-    print('running docker image {} ...'.format(docker_tag))
+    print('running docker image {} ...'.format(DOCKER_IMAGE_TAG))
     # run with a read-only root file system, write to /dev/stdout
     # ldconfig writes to a temp file then renames; use python to write it to stdout
     # this lets this work on CircleCI
     command = ('docker', 'run', '--read-only', '--interactive', '--rm',
         '--mount=type=tmpfs,destination=/tmp',
-        '--entrypoint=sh', docker_tag, '-c',
+        '--entrypoint=sh', DOCKER_IMAGE_TAG, '-c',
         'ldconfig -C /tmp/out && python -c "import sys; data = open(\'/tmp/out\').read(); sys.stdout.write(data)"')
     output = subprocess.check_output(command)
 

@@ -1,33 +1,17 @@
 load("@com_bluecore_rules_pyz//rules_python_zip:rules_python_zip.bzl", "pyz_binary", "pyz_test")
-load("@com_bluecore_rules_pyz//pyz_image:pyz_image.bzl", "pyz2_image", "pyz3_image", "rename_debs")
+load("@com_bluecore_rules_pyz//pyz_image:pyz_image.bzl", "pyz2_image", "pyz3_image")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_layer")
 
 exports_files(["zip_to_tar.py", "ld.so.cache"])
 
-# Workaround for https://github.com/bazelbuild/bazel/issues/5633
-renamed_debs = rename_debs(["@dash_deb//file", "@libc_bin_deb//file"])
-
-# Fixes distroless bugs:
-# https://github.com/GoogleContainerTools/distroless/issues/150
-container_image(
+alias(
     name="py2_image_base",
-    base="@py_image_base//image",
-    debs=renamed_debs,
-    layers=[":ld_so_cache_layer"],
+    actual="@pyz2_image_base//image",
     visibility=["//visibility:public"],
 )
-# TODO: explicitly create a tar to avoid an extra layer?
-container_layer(
-    name="ld_so_cache_layer",
-    files=[":ld.so.cache"],
-    mode="0644",
-    directory="/etc",
-)
-container_image(
+alias(
     name="py3_image_base",
-    base="@py3_image_base//image",
-    debs=renamed_debs,
-    layers=[":ld_so_cache_layer"],
+    actual="@pyz3_image_base//image",
     visibility=["//visibility:public"],
 )
 
