@@ -24,7 +24,7 @@ def pyz2_image(name, binary, base=BASE_PY2_CONTAINER_IMAGE, entrypoint=None, **k
         base=base,
         tars=[outtar],
         entrypoint = entrypoint,
-
+        legacy_run_behavior = False,
         **kwargs
     )
 
