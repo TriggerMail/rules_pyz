@@ -74,7 +74,6 @@ sh_binary(
     name="generate_ldconfig_cache",
     srcs=["generate_ldconfig_cache.py"],
     data=[":py2_image_base"],
-    tags=["ci_disabled"],
 )
 
 genrule(
@@ -82,12 +81,10 @@ genrule(
     outs=["ld.so.cache.new"],
     cmd="$(location :generate_ldconfig_cache) $@",
     tools = [":generate_ldconfig_cache"],
-    tags=["ci_disabled"],
 )
 
 sh_test(
     name="check_ld_so_cache",
     srcs=["check_ld_so_cache.py"],
     data=[":ld.so.cache.new", ":ld.so.cache"],
-    tags=["ci_disabled"],
 )

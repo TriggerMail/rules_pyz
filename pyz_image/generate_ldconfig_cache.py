@@ -26,19 +26,19 @@ def main():
     print('loading image {} ...'.format(container_path))
     subprocess.check_call((container_path, ))
 
-    # create a temporary directory to store the output
-    tempdir = tempfile.mkdtemp()
-    try:
-        docker_tag = 'bazel/' + CONTAINER_IMAGE_PATH.replace('/', ':')
-        print('running docker image {} ...'.format(docker_tag))
-        # run with a read-only root file system, write to /output
-        subprocess.check_call(('docker', 'run', '--read-only', '--interactive', '--rm',
-            '--mount=type=bind,source={},destination=/output'.format(tempdir),
-            '--entrypoint=/sbin/ldconfig', docker_tag, '-C', '/output/ld.so.cache'))
+    docker_tag = 'bazel/' + CONTAINER_IMAGE_PATH.replace('/', ':')
+    print('running docker image {} ...'.format(docker_tag))
+    # run with a read-only root file system, write to /dev/stdout
+    # ldconfig writes to a temp file then renames; use python to write it to stdout
+    # this lets this work on CircleCI
+    command = ('docker', 'run', '--read-only', '--interactive', '--rm',
+        '--mount=type=tmpfs,destination=/tmp',
+        '--entrypoint=sh', docker_tag, '-c',
+        'ldconfig -C /tmp/out && python -c "import sys; data = open(\'/tmp/out\').read(); sys.stdout.write(data)"')
+    output = subprocess.check_output(command)
 
-        shutil.copyfile(tempdir + '/ld.so.cache', output_path)
-    finally:
-        shutil.rmtree(tempdir)
+    with open(output_path, 'wb') as out_file:
+        out_file.write(output)
 
 
 if __name__ == '__main__':
