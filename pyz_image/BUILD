@@ -73,7 +73,7 @@ sh_test(
 sh_binary(
     name="generate_ldconfig_cache",
     srcs=["generate_ldconfig_cache.py"],
-    data=[":py2_base_image"],
+    data=[":py2_image_base"],
     tags=["ci_disabled"],
 )
 

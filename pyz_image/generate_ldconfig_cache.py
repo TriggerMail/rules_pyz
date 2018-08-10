@@ -6,7 +6,7 @@ import sys
 import tempfile
 
 
-CONTAINER_IMAGE_PATH = 'pyz_image/py2_base_image'
+CONTAINER_IMAGE_PATH = 'pyz_image/py2_image_base'
 
 
 def main():
