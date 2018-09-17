@@ -28,4 +28,4 @@ if [ ! -e "$MAIN_PATH" ]; then
 fi
 
 # Set -E -S -s: Attempt to isolate the Python environment as much as possible
-exec {{INTEPRETER_PATH}} ${BAZEL_PYTHON_EXTRA_FLAGS} -E -S -s "${MAIN_PATH}" $@
+exec {{INTEPRETER_PATH}} ${BAZEL_PYTHON_EXTRA_FLAGS} -E -S -s "${MAIN_PATH}" "$@"
