@@ -11,8 +11,8 @@ def pip_repositories():
     if 'pypi_pip' not in existing:
         http_archive(
             name = 'pypi_pip',
-            url = 'https://files.pythonhosted.org/packages/0f/74/ecd13431bcc456ed390b44c8a6e917c1820365cbebcb6a8974d1cd045ab4/pip-10.0.1-py2.py3-none-any.whl',
-            sha256 = '717cdffb2833be8409433a93746744b59505f42146e8d37de6c62b430e25d6d7',
+            url = 'https://files.pythonhosted.org/packages/5f/25/e52d3f31441505a5f3af41213346e5b6c221c9e086a166f3703d2ddaf940/pip-18.0-py2.py3-none-any.whl',
+            sha256 = '070e4bf493c7c2c9f6a08dd797dd3c066d64074c38e9e8a0fb4e6541f266d96c',
             build_file_content=build_content,
             type="zip",
         )
