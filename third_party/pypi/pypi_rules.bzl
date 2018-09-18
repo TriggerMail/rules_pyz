@@ -371,8 +371,8 @@ def pypi_repositories():
     if "pypi_certifi" not in existing_rules:
         http_archive(
             name="pypi_certifi",
-            url="https://files.pythonhosted.org/packages/7c/e6/92ad559b7192d846975fc916b65f667c7b8c3a32bea7372340bfe9a15fa5/certifi-2018.4.16-py2.py3-none-any.whl",
-            sha256="9fa520c1bacfb634fa7af20a76bcbd3d5fb390481724c597da32c719a7dca4b0",
+            url="https://files.pythonhosted.org/packages/df/f7/04fee6ac349e915b82171f8e23cee63644d83663b34c539f7a09aed18f9e/certifi-2018.8.24-py2.py3-none-any.whl",
+            sha256="456048c7e371c089d0a77a5212fb37a2c2dce1e24146e3b7e0261736aaeaa22a",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
@@ -403,16 +403,16 @@ def pypi_repositories():
     if "pypi_cryptography__linux" not in existing_rules:
         http_archive(
             name="pypi_cryptography__linux",
-            url="https://files.pythonhosted.org/packages/dd/c2/3a5bfefb25690725824ade71e6b65449f0a9f4b29702cce10560f786ebf6/cryptography-2.2.2-cp27-cp27mu-manylinux1_x86_64.whl",
-            sha256="6fef51ec447fe9f8351894024e94736862900d3a9aa2961528e602eb65c92bdb",
+            url="https://files.pythonhosted.org/packages/87/e6/915a482dbfef98bbdce6be1e31825f591fc67038d4ee09864c1d2c3db371/cryptography-2.3.1-cp27-cp27mu-manylinux1_x86_64.whl",
+            sha256="31db8febfc768e4b4bd826750a70c79c99ea423f4697d1dab764eb9f9f849519",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_cryptography__osx" not in existing_rules:
         http_archive(
             name="pypi_cryptography__osx",
-            url="https://files.pythonhosted.org/packages/58/c1/23bea66007d4be75ce02056fac665f9a207535e89fb3c7931420fa4a5f57/cryptography-2.2.2-cp27-cp27m-macosx_10_6_intel.whl",
-            sha256="abd070b5849ed64e6d349199bef955ee0ad99aefbad792f0c587f8effa681a5e",
+            url="https://files.pythonhosted.org/packages/5d/b1/9863611b121ee524135bc0068533e6d238cc837337170e722224fe940e2d/cryptography-2.3.1-cp27-cp27m-macosx_10_6_intel.whl",
+            sha256="17db09db9d7c5de130023657be42689d1a5f60502a14f6f745f6f65a6b8195c0",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
@@ -435,16 +435,16 @@ def pypi_repositories():
     if "pypi_google_api_core" not in existing_rules:
         http_archive(
             name="pypi_google_api_core",
-            url="https://files.pythonhosted.org/packages/2f/19/4f45c195de8b02d24a21891100d012afcb80b91c198971fc1b95be067052/google_api_core-1.2.0-py2.py3-none-any.whl",
-            sha256="c11cdbb6781a2c26b4b3d7e7c07a4d3c166d7d4d2173fc5ca520798d2d19de62",
+            url="https://files.pythonhosted.org/packages/29/de/2b86f01a00eb72a5cbb80a720cd247e67eba8972cbb0914f45623693476d/google_api_core-1.4.0-py2.py3-none-any.whl",
+            sha256="1953a4109ede689cf681c43d91cc1fd55e2432b52b6337f95f5a1841bcb3b707",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_google_auth" not in existing_rules:
         http_archive(
             name="pypi_google_auth",
-            url="https://files.pythonhosted.org/packages/53/06/6e6d5bfa4d23ee40efd772d6b681a7afecd859a9176e564b8c329382370f/google_auth-1.5.0-py2.py3-none-any.whl",
-            sha256="82a34e1a59ad35f01484d283d2a36b7a24c8c404a03a71b3afddd0a4d31e169f",
+            url="https://files.pythonhosted.org/packages/58/cb/96dbb4e50e7a9d856e89cc9c8e36ab1055f9774f7d85f37e2156c1d79d9f/google_auth-1.5.1-py2.py3-none-any.whl",
+            sha256="a4cf9e803f2176b5de442763bd339b313d3f1ed3002e3e1eb6eec1d7c9bbc9b4",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
@@ -459,8 +459,8 @@ def pypi_repositories():
     if "pypi_google_cloud_datastore" not in existing_rules:
         http_archive(
             name="pypi_google_cloud_datastore",
-            url="https://files.pythonhosted.org/packages/9d/1b/2d47219d50f818706a1202558d4365cf2fcf4c092c18db68065164944667/google_cloud_datastore-1.6.0-py2.py3-none-any.whl",
-            sha256="3f43409a15451b69161eb321826dd2e014191822ef7af7e71423cec85d921b01",
+            url="https://files.pythonhosted.org/packages/d8/4b/aab0f1578eff1146e019670e079f5f939e46c5b004b65063b450c8d87af0/google_cloud_datastore-1.7.0-py2.py3-none-any.whl",
+            sha256="ff15ce4a2ff82a7655e1bfe5a72159c6518598b4cd65c7003c19d472c6ff8b71",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
@@ -475,24 +475,24 @@ def pypi_repositories():
     if "pypi_grpcio__linux" not in existing_rules:
         http_archive(
             name="pypi_grpcio__linux",
-            url="https://files.pythonhosted.org/packages/2a/d5/eb371e43d65989267a9daa90ee8f92d79b216184ea3c8cf0670e5c2388eb/grpcio-1.12.0-cp27-cp27mu-manylinux1_x86_64.whl",
-            sha256="fd5409f797a01d82e80800d078b6ee43ddae43cf93ad2b30d601e471f08bec96",
+            url="https://files.pythonhosted.org/packages/3d/15/b34114198a2bc9c9bb73b21e2b559468a1a68bb28b373d21da6e51d6204f/grpcio-1.15.0-cp27-cp27mu-manylinux1_x86_64.whl",
+            sha256="670e884e5b5c8805e30d214da790cb86487db27ed9e7ccd74f11a2bc5a27df2b",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_grpcio__osx" not in existing_rules:
         http_archive(
             name="pypi_grpcio__osx",
-            url="https://files.pythonhosted.org/packages/0a/9d/aa4dd93ae061526e5ba6b8e9f6e11095ed9df70fdf0a3ad9288a600a76c1/grpcio-1.12.0-cp27-cp27m-macosx_10_12_x86_64.whl",
-            sha256="e87393c34532636741e06f39d01ef1df0c7ca751b4aa15d6ac8fb6482484de9f",
+            url="https://files.pythonhosted.org/packages/13/b5/7ada39c840c53f7cd2db642a2cd66d768a1366b4c26ffba4ec9e46bea58e/grpcio-1.15.0-cp27-cp27m-macosx_10_12_x86_64.whl",
+            sha256="16cdd82a3aed9b6d3067492413bfffe61bf0f98c06f2942f887d79b8fd68898d",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_idna" not in existing_rules:
         http_archive(
             name="pypi_idna",
-            url="https://files.pythonhosted.org/packages/27/cc/6dd9a3869f15c2edfab863b992838277279ce92663d334df9ecf5106f5c6/idna-2.6-py2.py3-none-any.whl",
-            sha256="8c7309c718f94b3a625cb648ace320157ad16ff131ae0af362c9f21b80ef6ec4",
+            url="https://files.pythonhosted.org/packages/4b/2a/0276479a4b3caeb8a8c1af2f8e4355746a97fab05a372e4a2c6a6b876165/idna-2.7-py2.py3-none-any.whl",
+            sha256="156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
@@ -507,48 +507,48 @@ def pypi_repositories():
     if "pypi_numpy__linux" not in existing_rules:
         http_archive(
             name="pypi_numpy__linux",
-            url="https://files.pythonhosted.org/packages/c0/e7/08f059a00367fd613e4f2875a16c70b6237268a1d6d166c6d36acada8301/numpy-1.14.3-cp27-cp27mu-manylinux1_x86_64.whl",
-            sha256="0db6301324d0568089663ef2701ad90ebac0e975742c97460e89366692bd0563",
+            url="https://files.pythonhosted.org/packages/c9/16/1134977cc35d2f72dbe80efa75a8e989ac21289f8e7e2c9005444cd17cd5/numpy-1.15.1-cp27-cp27mu-manylinux1_x86_64.whl",
+            sha256="df0b02c6705c5d1c25cc35c7b5d6b6f9b3b30833f9d178843397ae55ecc2eebb",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_numpy__osx" not in existing_rules:
         http_archive(
             name="pypi_numpy__osx",
-            url="https://files.pythonhosted.org/packages/b8/97/ecff917542e3a8a33bc8e88c031ed50c90577fd205eab362b29f3e57c09e/numpy-1.14.3-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl",
-            sha256="a8dbab311d4259de5eeaa5b4e83f5f8545e4808f9144e84c0f424a6ee55a7b98",
+            url="https://files.pythonhosted.org/packages/e7/c1/d5c47de35e366b1c2f60da88a24b25d3037b892417c5c3c5398313fb54f5/numpy-1.15.1-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl",
+            sha256="5e359e9c531075220785603e5966eef20ccae9b3b6b8a06fdfb66c084361ce92",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_protobuf__linux" not in existing_rules:
         http_archive(
             name="pypi_protobuf__linux",
-            url="https://files.pythonhosted.org/packages/9d/61/54c3a9cfde6ffe0ca6a1786ddb8874263f4ca32e7693ad383bd8cf935015/protobuf-3.5.2.post1-cp27-cp27mu-manylinux1_x86_64.whl",
-            sha256="5c1c8f6a0a68a874e3beff89255959dd80fad45870e96c88944a1b81a22dd5f5",
+            url="https://files.pythonhosted.org/packages/b8/c2/b7f587c0aaf8bf2201405e8162323037fe8d17aa21d3c7dda811b8d01469/protobuf-3.6.1-cp27-cp27mu-manylinux1_x86_64.whl",
+            sha256="59cd75ded98094d3cf2d79e84cdb38a46e33e7441b2826f3838dcc7c07f82995",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_protobuf__osx" not in existing_rules:
         http_archive(
             name="pypi_protobuf__osx",
-            url="https://files.pythonhosted.org/packages/c7/15/e21b9597043ecdc586b76b29608b30212658d239d66407621a642aedb41f/protobuf-3.5.2.post1-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl",
-            sha256="ac0067e3c60737865ed72bb7416e02297d229d960902802d874c0e167128c809",
+            url="https://files.pythonhosted.org/packages/2b/2b/d51219eb18a140836cb656053e5408cd18fd752217ff73ca596204cd3183/protobuf-3.6.1-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl",
+            sha256="10394a4d03af7060fa8a6e1cbf38cea44be1467053b0aea5bbfcb4b13c4b88c4",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_pyasn1" not in existing_rules:
         http_archive(
             name="pypi_pyasn1",
-            url="https://files.pythonhosted.org/packages/a0/70/2c27740f08e477499ce19eefe05dbcae6f19fdc49e9e82ce4768be0643b9/pyasn1-0.4.3-py2.py3-none-any.whl",
-            sha256="a66dcda18dbf6e4663bde70eb30af3fc4fe1acb2d14c4867a861681887a5f9a2",
+            url="https://files.pythonhosted.org/packages/d1/a1/7790cc85db38daa874f6a2e6308131b9953feb1367f2ae2d1123bb93a9f5/pyasn1-0.4.4-py2.py3-none-any.whl",
+            sha256="b9d3abc5031e61927c82d4d96c1cec1e55676c1a991623cfed28faea73cdd7ca",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_pyasn1_modules" not in existing_rules:
         http_archive(
             name="pypi_pyasn1_modules",
-            url="https://files.pythonhosted.org/packages/e9/51/bcd96bf6231d4b2cc5e023c511bee86637ba375c44a6f9d1b4b7ad1ce4b9/pyasn1_modules-0.2.1-py2.py3-none-any.whl",
-            sha256="47fb6757ab78fe966e7c58b2030b546854f78416d653163f0ce9290cf2278e8b",
+            url="https://files.pythonhosted.org/packages/19/02/fa63f7ba30a0d7b925ca29d034510fc1ffde53264b71b4155022ddf3ab5d/pyasn1_modules-0.2.2-py2.py3-none-any.whl",
+            sha256="a38a8811ea784c0136abfdba73963876328f66172db21a05a82f9515909bfb4e",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
@@ -563,24 +563,24 @@ def pypi_repositories():
     if "pypi_pytz" not in existing_rules:
         http_archive(
             name="pypi_pytz",
-            url="https://files.pythonhosted.org/packages/dc/83/15f7833b70d3e067ca91467ca245bae0f6fe56ddc7451aa0dc5606b120f2/pytz-2018.4-py2.py3-none-any.whl",
-            sha256="65ae0c8101309c45772196b21b74c46b2e5d11b6275c45d251b150d5da334555",
+            url="https://files.pythonhosted.org/packages/30/4e/27c34b62430286c6d59177a0842ed90dc789ce5d1ed740887653b898779a/pytz-2018.5-py2.py3-none-any.whl",
+            sha256="a061aa0a9e06881eb8b3b2b43f05b9439d6583c206d0a6c340ff72a7b6669053",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_requests" not in existing_rules:
         http_archive(
             name="pypi_requests",
-            url="https://files.pythonhosted.org/packages/49/df/50aa1999ab9bde74656c2919d9c0c085fd2b3775fd3eca826012bef76d8c/requests-2.18.4-py2.py3-none-any.whl",
-            sha256="6a1b267aa90cac58ac3a765d067950e7dbbf75b1da07e895d1f594193a40a38b",
+            url="https://files.pythonhosted.org/packages/65/47/7e02164a2a3db50ed6d8a6ab1d6d60b69c4c3fdf57a284257925dfc12bda/requests-2.19.1-py2.py3-none-any.whl",
+            sha256="63b52e3c866428a224f97cab011de738c36aec0185aa91cfacd418b5d58911d1",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
     if "pypi_rsa" not in existing_rules:
         http_archive(
             name="pypi_rsa",
-            url="https://files.pythonhosted.org/packages/e1/ae/baedc9cb175552e95f3395c43055a6a5e125ae4d48a1d7a924baca83e92e/rsa-3.4.2-py2.py3-none-any.whl",
-            sha256="43f682fea81c452c98d09fc316aae12de6d30c4b5c84226642cf8f8fd1c93abd",
+            url="https://files.pythonhosted.org/packages/02/e5/38518af393f7c214357079ce67a317307936896e961e35450b70fad2a9cf/rsa-4.0-py2.py3-none-any.whl",
+            sha256="14ba45700ff1ec9eeb206a2ce76b32814958a98e372006c8fb76ba820211be66",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
@@ -603,8 +603,8 @@ def pypi_repositories():
     if "pypi_setuptools" not in existing_rules:
         http_archive(
             name="pypi_setuptools",
-            url="https://files.pythonhosted.org/packages/7f/e1/820d941153923aac1d49d7fc37e17b6e73bfbd2904959fffbad77900cf92/setuptools-39.2.0-py2.py3-none-any.whl",
-            sha256="8fca9275c89964f13da985c3656cb00ba029d7f3916b37990927ffdf264e7926",
+            url="https://files.pythonhosted.org/packages/81/17/a6301c14aa0c0dd02938198ce911eba84602c7e927a985bf9015103655d1/setuptools-40.4.1-py2.py3-none-any.whl",
+            sha256="822054653e22ef38eef400895b8ada55657c8db7ad88f7ec954bccff2b3b9b52",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
@@ -619,8 +619,8 @@ def pypi_repositories():
     if "pypi_urllib3" not in existing_rules:
         http_archive(
             name="pypi_urllib3",
-            url="https://files.pythonhosted.org/packages/63/cb/6965947c13a94236f6d4b8223e21beb4d576dc72e8130bd7880f600839b8/urllib3-1.22-py2.py3-none-any.whl",
-            sha256="06330f386d6e4b195fbfc736b297f58c5a892e4440e54d294d7004e3a9bbea1b",
+            url="https://files.pythonhosted.org/packages/bd/c9/6fdd990019071a4a32a5e7cb78a1d92c53851ef4f56f62a3486e6a7d8ffb/urllib3-1.23-py2.py3-none-any.whl",
+            sha256="b5725a0bd4ba422ab0e66e89e030c806576753ea3ee08554382c14e685d117b5",
             build_file_content=_BUILD_FILE_CONTENT,
             type="zip",
         )
