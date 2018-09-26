@@ -195,26 +195,27 @@ class Wheel(object):
     # https://packaging.python.org/specifications/core-metadata/#requires-dist-multiple-use
     requires_extra = {}
     extras = set()
-    for header in msg.get_all('Requires-Dist'):
-      header_parts = header.strip().split(':', 2)
-      specification = header_parts[1].strip()
+    if msg.get_all('Requires-Dist'):
+      for header in msg.get_all('Requires-Dist'):
+        header_parts = header.strip().split(':', 2)
+        specification = header_parts[1].strip()
 
-      package_and_version = specification
-      environment_marker = ''
-      extra = ''
-      if ';' in specification:
-        parts = specification.split(';', 2)
-        package_and_version = parts[0].strip()
-        environment_marker = parts[1].strip()
+        package_and_version = specification
+        environment_marker = ''
+        extra = ''
+        if ';' in specification:
+          parts = specification.split(';', 2)
+          package_and_version = parts[0].strip()
+          environment_marker = parts[1].strip()
 
-        extra, environment_marker = split_extra_from_environment_marker(environment_marker)
+          extra, environment_marker = split_extra_from_environment_marker(environment_marker)
 
-      if extra != '':
-        extras.add(extra)
-      key = (extra, environment_marker)
-      requires = requires_extra.get(key, [])
-      requires.append(package_and_version)
-      requires_extra[key] = requires
+        if extra != '':
+          extras.add(extra)
+        key = (extra, environment_marker)
+        requires = requires_extra.get(key, [])
+        requires.append(package_and_version)
+        requires_extra[key] = requires
 
     run_requires = []
     for (extra, environment_marker), requires in requires_extra.items():
