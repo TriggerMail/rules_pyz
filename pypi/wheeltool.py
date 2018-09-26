@@ -195,7 +195,7 @@ class Wheel(object):
     # https://packaging.python.org/specifications/core-metadata/#requires-dist-multiple-use
     requires_extra = {}
     extras = set()
-    for header in msg.getallmatchingheaders('Requires-Dist'):
+    for header in msg.get_all('Requires-Dist'):
       header_parts = header.strip().split(':', 2)
       specification = header_parts[1].strip()
 
