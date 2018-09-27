@@ -23,7 +23,7 @@ import os
 import pkg_resources
 from pkg_resources._vendor.packaging import markers
 import re
-from email import message
+import email
 import sys
 import zipfile
 
@@ -185,21 +185,15 @@ class Wheel(object):
   def _parse_metadata(self, file_object):
     # the METADATA file is in PKG-INFO format, which is a sequence of RFC822 headers:
     # https://www.python.org/dev/peps/pep-0241/
-    try:
-      msg = message.Message()
-    except NameError:
-      msg = message.EmailMessage()
-    msg.set_payload(file_object)
+    msg = email.message_from_bytes(file_object.read())
 
     # Requires-Dist format:
     # https://packaging.python.org/specifications/core-metadata/#requires-dist-multiple-use
     requires_extra = {}
     extras = set()
-    if msg.get_all('Requires-Dist'):
-      for header in msg.get_all('Requires-Dist'):
-        header_parts = header.strip().split(':', 2)
-        specification = header_parts[1].strip()
 
+    if msg.get_all('Requires-Dist'):
+      for specification in msg.get_all('Requires-Dist'):
         package_and_version = specification
         environment_marker = ''
         extra = ''
