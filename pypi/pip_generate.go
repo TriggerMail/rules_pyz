@@ -30,15 +30,15 @@ const pypiRulesHeader = `# AUTO GENERATED. DO NOT EDIT DIRECTLY.
 load("%s", "%s")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-_BUILD_FILE_CONTENT='''
+_BUILD_FILE_CONTENT = '''
 load("%s", "%s")
 
 pyz_library(
-    name="lib",
-    srcs=glob(["**/*.py"]),
-    data = glob(["**/*"], exclude=["**/*.py", "BUILD", "WORKSPACE", "*.whl.zip"]),
-    pythonroot=".",
-    visibility=["//visibility:public"],
+    name = "lib",
+    srcs = glob(["**/*.py"]),
+    data = glob(["**/*"], exclude = ["**/*.py", "BUILD", "WORKSPACE", "*.whl.zip"]),
+    pythonroot = ".",
+    visibility = ["//visibility:public"],
 )
 '''
 `
@@ -100,19 +100,19 @@ func (w *wheelInfo) makeBazelRule(name *string, wheelDir *string) string {
 	output := ""
 	if w.useLocalWheel {
 		output += fmt.Sprintf("    native.filegroup(\n")
-		output += fmt.Sprintf("        name=\"%s\",\n", *name)
-		output += fmt.Sprintf("        srcs=[\"%s\"],\n", path.Join(*wheelDir, filepath.Base(w.filePath)))
+		output += fmt.Sprintf("        name = \"%s\",\n", *name)
+		output += fmt.Sprintf("        srcs = [\"%s\"],\n", path.Join(*wheelDir, filepath.Base(w.filePath)))
 		// Fixes build error TODO: different type? comment that this is not the right license?
-		output += fmt.Sprintf("        licenses=[\"notice\"],\n")
+		output += fmt.Sprintf("        licenses = [\"notice\"],\n")
 		output += fmt.Sprintf("    )\n")
 	} else {
 		output += fmt.Sprintf("    if \"%s\" not in existing_rules:\n", *name)
 		output += fmt.Sprintf("        http_archive(\n")
-		output += fmt.Sprintf("            name=\"%s\",\n", *name)
-		output += fmt.Sprintf("            url=\"%s\",\n", w.url)
-		output += fmt.Sprintf("            sha256=\"%s\",\n", w.sha256)
-		output += fmt.Sprintf("            build_file_content=_BUILD_FILE_CONTENT,\n")
-		output += fmt.Sprintf("            type=\"zip\",\n")
+		output += fmt.Sprintf("            name = \"%s\",\n", *name)
+		output += fmt.Sprintf("            url = \"%s\",\n", w.url)
+		output += fmt.Sprintf("            sha256 = \"%s\",\n", w.sha256)
+		output += fmt.Sprintf("            build_file_content = _BUILD_FILE_CONTENT,\n")
+		output += fmt.Sprintf("            type = \"zip\",\n")
 		output += fmt.Sprintf("        )\n")
 	}
 	return output
@@ -526,12 +526,12 @@ func main() {
 	for _, dependency := range dependencies {
 
 		fmt.Fprintf(outputBzlFile, "    %s(\n", ruleGenerator.libraryRule)
-		fmt.Fprintf(outputBzlFile, "        name=\"%s\",\n", dependency.bazelLibraryName())
+		fmt.Fprintf(outputBzlFile, "        name = \"%s\",\n", dependency.bazelLibraryName())
 		if unzipPackages[dependency.name] {
-			fmt.Fprintf(outputBzlFile, "        zip_safe=False,\n")
+			fmt.Fprintf(outputBzlFile, "        zip_safe = False,\n")
 		}
 
-		fmt.Fprintf(outputBzlFile, "        deps=[\n")
+		fmt.Fprintf(outputBzlFile, "        deps = [\n")
 		for _, dep := range dependency.wheels[0].deps {
 			fmt.Fprintf(outputBzlFile, "            \"%s\",\n", pyPIToBazelPackageName(dep))
 		}
@@ -557,8 +557,8 @@ func main() {
 		}
 
 		// Fixes build error TODO: different type? comment that this is not the right license?
-		fmt.Fprintf(outputBzlFile, "        licenses=[\"notice\"],\n")
-		fmt.Fprintf(outputBzlFile, "        visibility=[\"//visibility:public\"],\n")
+		fmt.Fprintf(outputBzlFile, "        licenses = [\"notice\"],\n")
+		fmt.Fprintf(outputBzlFile, "        visibility = [\"//visibility:public\"],\n")
 		fmt.Fprintf(outputBzlFile, "    )\n")
 
 		// ensure output is reproducible: output extras in the same order
@@ -583,16 +583,16 @@ func main() {
 			}
 
 			fmt.Fprintf(outputBzlFile, "    %s(\n", ruleGenerator.libraryRule)
-			fmt.Fprintf(outputBzlFile, "        name=\"%s__%s\",\n", dependency.bazelLibraryName(), extraName)
-			fmt.Fprintf(outputBzlFile, "        deps=[\n")
+			fmt.Fprintf(outputBzlFile, "        name = \"%s__%s\",\n", dependency.bazelLibraryName(), extraName)
+			fmt.Fprintf(outputBzlFile, "        deps = [\n")
 			fmt.Fprintf(outputBzlFile, "            \":%s\",\n", dependency.bazelLibraryName())
 			for _, dep := range extraDeps {
 				fmt.Fprintf(outputBzlFile, "            \"%s\",\n", pyPIToBazelPackageName(dep))
 			}
 			fmt.Fprintf(outputBzlFile, "        ],\n")
 			// fmt.Fprintf(outputBzlFile, "        # Not the correct license but fixes a build error\n")
-			fmt.Fprintf(outputBzlFile, "        licenses=[\"notice\"],\n")
-			fmt.Fprintf(outputBzlFile, "        visibility=[\"//visibility:public\"],\n")
+			fmt.Fprintf(outputBzlFile, "        licenses = [\"notice\"],\n")
+			fmt.Fprintf(outputBzlFile, "        visibility = [\"//visibility:public\"],\n")
 			fmt.Fprintf(outputBzlFile, "    )\n")
 		}
 	}

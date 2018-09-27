@@ -27,7 +27,6 @@ from email import message
 import sys
 import zipfile
 
-
 def recurse_split_extra(parsed_parts):
   extra = ''
   remaining = []
@@ -187,9 +186,10 @@ class Wheel(object):
     # the METADATA file is in PKG-INFO format, which is a sequence of RFC822 headers:
     # https://www.python.org/dev/peps/pep-0241/
     try:
-      msg = message.Message(file_object)
+      msg = message.Message()
     except NameError:
-      msg = message.EmailMessage(file_object)
+      msg = message.EmailMessage()
+    msg.set_payload(file_object)
 
     # Requires-Dist format:
     # https://packaging.python.org/specifications/core-metadata/#requires-dist-multiple-use
