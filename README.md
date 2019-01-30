@@ -1,3 +1,8 @@
+# UNMAINTAINED
+
+Unfortunately we decided not to use Bazel, so these rules are effectively unmaintained. If someone would like to take ownership, please push a copy of the code somewhere, and I will be happy to link to it from here. Thanks for the interest!
+
+
 # Bazel Python Zip Rules
 
 This package is an alternative to Bazel's built-in Python rules that work with existing Python packages from PyPI. Eventually the built-in rules or [`rules_python`](https://github.com/bazelbuild/rules_python) should replace this, once Google improves them to work with external packages. Until then, these rules work for us.
