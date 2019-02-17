@@ -57,9 +57,9 @@ py_binary(
     data=[
         ":pip",
         ":wheeltool",
-
         "//tools:pip_generate",
-    ]
+    ],
+    visibility = ["//visibility:public"],
 )
 # checks tool path
 sh_test(
