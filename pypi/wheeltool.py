@@ -23,10 +23,9 @@ import os
 import pkg_resources
 from pkg_resources._vendor.packaging import markers
 import re
-import rfc822
+import email
 import sys
 import zipfile
-
 
 def recurse_split_extra(parsed_parts):
   extra = ''
@@ -186,32 +185,31 @@ class Wheel(object):
   def _parse_metadata(self, file_object):
     # the METADATA file is in PKG-INFO format, which is a sequence of RFC822 headers:
     # https://www.python.org/dev/peps/pep-0241/
-    message = rfc822.Message(file_object)
+    msg = email.message_from_bytes(file_object.read())
 
     # Requires-Dist format:
     # https://packaging.python.org/specifications/core-metadata/#requires-dist-multiple-use
     requires_extra = {}
     extras = set()
-    for header in message.getallmatchingheaders('Requires-Dist'):
-      header_parts = header.strip().split(':', 2)
-      specification = header_parts[1].strip()
 
-      package_and_version = specification
-      environment_marker = ''
-      extra = ''
-      if ';' in specification:
-        parts = specification.split(';', 2)
-        package_and_version = parts[0].strip()
-        environment_marker = parts[1].strip()
+    if msg.get_all('Requires-Dist'):
+      for specification in msg.get_all('Requires-Dist'):
+        package_and_version = specification
+        environment_marker = ''
+        extra = ''
+        if ';' in specification:
+          parts = specification.split(';', 2)
+          package_and_version = parts[0].strip()
+          environment_marker = parts[1].strip()
 
-        extra, environment_marker = split_extra_from_environment_marker(environment_marker)
+          extra, environment_marker = split_extra_from_environment_marker(environment_marker)
 
-      if extra != '':
-        extras.add(extra)
-      key = (extra, environment_marker)
-      requires = requires_extra.get(key, [])
-      requires.append(package_and_version)
-      requires_extra[key] = requires
+        if extra != '':
+          extras.add(extra)
+        key = (extra, environment_marker)
+        requires = requires_extra.get(key, [])
+        requires.append(package_and_version)
+        requires_extra[key] = requires
 
     run_requires = []
     for (extra, environment_marker), requires in requires_extra.items():
@@ -223,8 +221,8 @@ class Wheel(object):
       run_requires.append(value)
 
     return {
-      'name': message['Name'],
-      'version': message['Version'],
+      'name': msg['Name'],
+      'version': msg['Version'],
       'run_requires': run_requires,
       'extras': list(extras),
     }
